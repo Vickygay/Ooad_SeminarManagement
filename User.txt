@@ -1,6 +1,3 @@
-CREATE TABLE Users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL
-);
+userID,name,email,password
+E120101,John Doe,john.doe@example.com,e3
+E120102,Jane Smith,jane.smith@example.com,password456
