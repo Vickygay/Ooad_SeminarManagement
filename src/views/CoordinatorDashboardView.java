@@ -18,11 +18,6 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         setVisible(true);
     }
 
-    @Override
-    public void updateProfile() {
-        // Logic for updating coordinator profile
-        System.out.println("Updating Coordinator Profile...");
-    }
 
     @Override
     public void viewAwardee() {

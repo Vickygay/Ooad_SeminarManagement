@@ -1,8 +1,8 @@
 package views;
 
 // In views/DashboardView.java
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class DashboardView extends JFrame implements Dashboard {
     public DashboardView() {
@@ -18,12 +18,6 @@ public class DashboardView extends JFrame implements Dashboard {
         panel.add(label, BorderLayout.CENTER);
 
         add(panel);
-    }
-
-    @Override
-    public void updateProfile() {
-        // Default update profile logic (if any)
-        System.out.println("Updating Profile...");
     }
 
     @Override
