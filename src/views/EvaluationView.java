@@ -137,8 +137,8 @@ public class EvaluationView extends JFrame {
             dispose();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numbers for scores.", "Input Error", JOptionPane.ERROR_MESSAGE);
-        }
+           JOptionPane.showMessageDialog(this, "Please enter valid numbers for scores.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
     private boolean isInvalid(double score) {

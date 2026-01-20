@@ -1,3 +1,0 @@
-userID,name,email,password
-E120101,John Doe,john.doe@example.com,e3
-E120102,Jane Smith,jane.smith@example.com,password456
