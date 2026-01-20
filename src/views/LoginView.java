@@ -76,7 +76,7 @@ public class LoginView extends JFrame {
                     dispose(); // Close login screen
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid credentials!");
-                    clearFields(); 
+                    clearFields();
                 }
             }
         });
@@ -101,7 +101,7 @@ public class LoginView extends JFrame {
             return true; // Admin login is successful
         } else if (userID.equals("std111221") && password.equals("s3")) {
             return true; // Student login is successful
-        } else if (userID.equals("E120101") && password.equals("e3")) {
+        } else if (userID.equals("E120102") && password.equals("e3")) {
             return true; // Evaluator login is successful
         } else if (userID.equals("coordinator1") && password.equals("c3")) {
             return true; // Coordinator login is successful
@@ -126,8 +126,7 @@ public class LoginView extends JFrame {
     }
 
     public void clearFields() {
-    userIDField.setText(""); // Clear the User ID field
-    passwordField.setText(""); // Clear the Password field
+        userIDField.setText(""); // Clear the User ID field
+        passwordField.setText(""); // Clear the Password field
     }
 }
-
