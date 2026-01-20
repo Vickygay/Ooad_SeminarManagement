@@ -29,8 +29,9 @@ public class LoginView extends JFrame {
         userIDField.setPreferredSize(new Dimension(500, 40));
         userIDLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         userIDField.setFont(new Font("Arial", Font.PLAIN, 16));
-        
-        gbc.gridx = 0; gbc.gridy = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.insets = new Insets(10, 10, 5, 10);
         panel.add(userIDLabel, gbc);
 
@@ -43,8 +44,9 @@ public class LoginView extends JFrame {
         passwordField.setPreferredSize(new Dimension(500, 40));
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
-        
-        gbc.gridx = 0; gbc.gridy = 1;
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.insets = new Insets(5, 10, 5, 10);
         panel.add(passwordLabel, gbc);
 
@@ -54,7 +56,8 @@ public class LoginView extends JFrame {
         // Login button
         loginButton = new JButton("Login");
         loginButton.setFont(new Font("Arial", Font.BOLD, 18));
-        gbc.gridx = 1; gbc.gridy = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         gbc.insets = new Insets(20, 10, 10, 10);
         panel.add(loginButton, gbc);
 
@@ -67,10 +70,10 @@ public class LoginView extends JFrame {
                 String password = new String(passwordField.getPassword());
 
                 if (validateLoginFromFile(userID, password)) {
-                    String role = getRole(); 
-                    
+                    String role = getRole();
+
                     JOptionPane.showMessageDialog(null, "Login Successful! Role: " + role);
-                    
+
                     // Navigate based on role found in text file
                     if (role.equalsIgnoreCase("Student")) {
                         new StudentDashboardView().setVisible(true);
@@ -79,7 +82,7 @@ public class LoginView extends JFrame {
                     } else if (role.equalsIgnoreCase("Coordinator")) {
                         new CoordinatorDashboardView().setVisible(true);
                     }
-                    dispose(); 
+                    dispose();
                 } else {
                     showErrorMessage("Invalid credentials or user does not exist!");
                     clearFields();
@@ -122,7 +125,7 @@ public class LoginView extends JFrame {
     public void showWelcomeScreen() {
         JOptionPane.showMessageDialog(this, "Login Successful!");
     }
-    
+
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
     }
