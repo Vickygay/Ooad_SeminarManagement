@@ -2,78 +2,117 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
+import models.Presentation;
 
 public class EvaluatorDashboardView extends JFrame {
-    private JButton viewAssignedPresentationButton;
+    // 1. Declare all 6 buttons shown in the image
+    private JButton assignedPresentationButton;
     private JButton reviewPresentationButton;
-    private JButton provideFeedbackButton;
+    private JButton feedbackButton;
     private JButton nominateStudentButton;
+    private JButton nomineeButton;
+    private JButton awardeeButton;
 
     public EvaluatorDashboardView() {
         setTitle("Evaluator Dashboard");
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the window on screen
 
-        // Layout and Components
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 3, 10, 10)); // Use GridLayout for better alignment with 3 columns
+        // 2. Main Container with Padding
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add margins around the edges
 
-        // Create buttons with adjusted sizes
-        viewAssignedPresentationButton = new JButton("View Assigned Presentation");
-        viewAssignedPresentationButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Adjust font size
-        viewAssignedPresentationButton.setPreferredSize(new Dimension(250, 40)); // Set smaller size
+        // 3. Title Label
+        JLabel titleLabel = new JLabel("Evaluation Dashboard", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0)); // Space below title
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
 
-        reviewPresentationButton = new JButton("Review Presentation");
-        reviewPresentationButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Adjust font size
-        reviewPresentationButton.setPreferredSize(new Dimension(250, 40)); // Set smaller size
+        // 4. Grid Panel for Buttons (3 Rows, 2 Columns, Gaps of 50px horizontal, 30px
+        // vertical)
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(3, 2, 50, 30));
 
-        provideFeedbackButton = new JButton("Provide Feedback");
-        provideFeedbackButton.setFont(new Font("Arial", Font.PLAIN, 30)); // Adjust font size
-        provideFeedbackButton.setPreferredSize(new Dimension(250, 40)); // Set smaller size
+        // Initialize Buttons with text matching your image
+        assignedPresentationButton = createStyledButton("Assigned Presentation");
+        reviewPresentationButton = createStyledButton("Review Presentation");
+        feedbackButton = createStyledButton("Feedback");
+        nominateStudentButton = createStyledButton("Nominate Student");
+        nomineeButton = createStyledButton("Nominee");
+        awardeeButton = createStyledButton("Awardee");
 
-        nominateStudentButton = new JButton("Nominate Student");
-        nominateStudentButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Adjust font size
-        nominateStudentButton.setPreferredSize(new Dimension(250, 40)); // Set smaller size
+        // Add buttons to the panel in the specific order:
+        // Row 1
+        buttonPanel.add(assignedPresentationButton);
+        buttonPanel.add(reviewPresentationButton);
+        // Row 2
+        buttonPanel.add(feedbackButton);
+        buttonPanel.add(nominateStudentButton);
+        // Row 3
+        buttonPanel.add(nomineeButton);
+        buttonPanel.add(awardeeButton);
 
-        // Add buttons to the panel
-        panel.add(viewAssignedPresentationButton);
-        panel.add(reviewPresentationButton);
-        panel.add(provideFeedbackButton);
-        panel.add(nominateStudentButton);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        add(mainPanel);
 
-        add(panel);
-
-        // Action listeners for each button
-        viewAssignedPresentationButton.addActionListener(e -> viewAssignedPresentation());
+        // 5. Add Action Listeners
+        assignedPresentationButton.addActionListener(e -> viewAssignedPresentation());
         reviewPresentationButton.addActionListener(e -> reviewPresentation());
-        provideFeedbackButton.addActionListener(e -> provideFeedback());
+        feedbackButton.addActionListener(e -> provideFeedback());
         nominateStudentButton.addActionListener(e -> nominateStudent());
+        nomineeButton.addActionListener(e -> viewNominees());
+        awardeeButton.addActionListener(e -> viewAwardees());
 
         setVisible(true);
     }
 
-    // Methods to handle the actions
+    // Helper method to style buttons consistently
+    private JButton createStyledButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Arial", Font.PLAIN, 20));
+        btn.setFocusPainted(false);
+        btn.setBackground(new Color(200, 210, 230)); // Light blue-ish color like the image
+        return btn;
+    }
+
+    // --- Action Methods ---
+
     public void viewAssignedPresentation() {
         System.out.println("Viewing Assigned Presentation...");
-        // Your logic to view the assigned presentation
     }
 
     public void reviewPresentation() {
-        System.out.println("Reviewing Presentation...");
-        // Your logic to review the presentation, such as viewing more details
+        System.out.println("Opening Evaluation Form...");
+        
+        // 1. Create a dummy presentation WITH A STUDENT ID
+        Presentation dummyPresentation = new Presentation();
+        dummyPresentation.setStudentID("S101"); // <--- Hardcoded for testing now
+        
+        // 2. Open the Evaluation Window
+        EvaluationView evaluationWindow = new EvaluationView(dummyPresentation);
+        evaluationWindow.setVisible(true);
     }
 
     public void provideFeedback() {
         System.out.println("Providing Feedback...");
-        // Your logic to provide feedback after reviewing the presentation
     }
 
     public void nominateStudent() {
         System.out.println("Nominating Student...");
-        // Your logic to nominate a student for the presentation
+    }
+
+    // New methods for the new buttons
+    public void viewNominees() {
+        System.out.println("Viewing Nominees...");
+    }
+
+    public void viewAwardees() {
+        System.out.println("Viewing Awardees...");
     }
 
     public static void main(String[] args) {
-        new EvaluatorDashboardView(); // This will create and display the window
+        // Run this file directly to test the UI
+        new EvaluatorDashboardView();
     }
 }
