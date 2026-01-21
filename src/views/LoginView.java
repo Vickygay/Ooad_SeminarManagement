@@ -126,10 +126,6 @@ public class LoginView extends JFrame {
         return validatedRole;
     }
 
-    public void showWelcomeScreen() {
-        JOptionPane.showMessageDialog(this, "Login Successful!");
-    }
-
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
     }
