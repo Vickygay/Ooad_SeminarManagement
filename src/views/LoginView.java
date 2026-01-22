@@ -61,6 +61,10 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(20, 10, 10, 10);
         panel.add(loginButton, gbc);
 
+        // --- NEW: Enable "Enter" key to trigger Login ---
+        getRootPane().setDefaultButton(loginButton);
+        // ------------------------------------------------
+
         add(panel);
 
         loginButton.addActionListener(new ActionListener() {
@@ -71,15 +75,16 @@ public class LoginView extends JFrame {
 
                 if (validateLoginFromFile(userID, password)) {
                     String role = getRole();
-
                     JOptionPane.showMessageDialog(null, "Login Successful! Role: " + role);
 
-                    // Navigate based on role found in text file
                     if (role.equalsIgnoreCase("Student")) {
                         new StudentDashboardView().setVisible(true);
-                    } else if (role.equalsIgnoreCase("Evaluator")) {
-                        new EvaluatorDashboardView().setVisible(true);
-                    } else if (role.equalsIgnoreCase("Coordinator")) {
+                    } 
+                    else if (role.equalsIgnoreCase("Evaluator")) {
+                        // Pass the 'userID' to the dashboard!
+                        new EvaluatorDashboardView(userID).setVisible(true); 
+                    } 
+                    else if (role.equalsIgnoreCase("Coordinator")) {
                         new CoordinatorDashboardView().setVisible(true);
                     }
                     dispose();

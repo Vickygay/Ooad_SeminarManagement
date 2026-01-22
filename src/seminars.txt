@@ -1,2 +1,3 @@
 Paper Presentation Session,cnmx1004,2026-01-22,E120101,std111221
 Expert Lecture,Classroom 1,2026-02-22,E1222,std111221
+Paper Presentation Session,CNMX1001,2026-01-23,E001,std111221
