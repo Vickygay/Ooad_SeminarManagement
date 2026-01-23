@@ -2,118 +2,109 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
-import models.UserProfile;
-import models.UserDatabase;
+import java.util.ArrayList;
 
 public class ProfileUpdateView extends JFrame {
-    private JTextField nameField;
-    private JTextField emailField;
-    private JTextField passwordField;
+    private JTextField nameField, emailField, passwordField;
     private JButton saveButton;
+    private String currentUserID;
 
     public ProfileUpdateView(String userID) {
+        this.currentUserID = userID; // Store ID for saving later
         setTitle("Update Profile");
-        setSize(400, 250);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close this window, not the whole application
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel nameLabel = new JLabel("Name:");
+        // UI Components
+        panel.add(new JLabel("User ID:"));
+        JTextField idField = new JTextField(userID);
+        idField.setEditable(false);
+        panel.add(idField);
+
+        panel.add(new JLabel("Name:"));
         nameField = new JTextField();
-        JLabel emailLabel = new JLabel("Email:");
-        emailField = new JTextField();
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordField = new JTextField();
-
-        saveButton = new JButton("Save");
-
-        panel.add(nameLabel);
         panel.add(nameField);
-        panel.add(emailLabel);
+
+        panel.add(new JLabel("Email:"));
+        emailField = new JTextField();
         panel.add(emailField);
-        panel.add(passwordLabel);
+
+        panel.add(new JLabel("Password:"));
+        passwordField = new JTextField();
         panel.add(passwordField);
-        panel.add(new JLabel()); // Empty label for spacing
+
+        saveButton = new JButton("Save Changes");
+        panel.add(new JLabel()); // Spacer
         panel.add(saveButton);
 
         add(panel);
 
-        // Read user data from the file based on userID and populate the fields
-        readUserDataFromFile(userID);
+        // 1. Load Data safely
+        loadDataForUser(userID);
 
-        // Action Listener for Save button
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Create UserProfile object with values entered in the fields
-                UserProfile userProfile = new UserProfile(userID, nameField.getText(), emailField.getText(),
-                        passwordField.getText());
-
-                // Update the user profile in UserDatabase (if you want to keep the data in memory)
-                UserDatabase.getUsers().put(userID, userProfile); // Access users map through the getter method
-
-                // Show success message
-                JOptionPane.showMessageDialog(ProfileUpdateView.this, "Profile Updated Successfully!");
-
-                // Optionally, you can save the updated data back to the file
-                saveUserDataToFile();
-
-                // Close the profile update window after saving
-                dispose();
-            }
+        // 2. Save Data safely
+        saveButton.addActionListener(e -> {
+            updateUserInFile(currentUserID, nameField.getText(), emailField.getText(), passwordField.getText());
+            JOptionPane.showMessageDialog(this, "Profile Updated Successfully!");
+            dispose();
         });
 
         setVisible(true);
     }
 
-    // Function to read user data from the file and populate the fields based on userID
-    private void readUserDataFromFile(String userID) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("user.txt"));
+    // --- Helper: Find the user and fill the text boxes ---
+    private void loadDataForUser(String id) {
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                // Assuming user information is stored as "userID,name,email,password"
-                String[] userData = line.split(","); // Split by comma
-
-                // If the first value matches the userID, load the corresponding data
-                if (userData[0].equals(userID)) {
-                    String name = userData[1]; // Name is the second part
-                    String email = userData[2]; // Email is the third part
-                    String password = userData[3]; // Password is the fourth part
-
-                    // Set values to text fields
-                    nameField.setText(name);
-                    emailField.setText(email);
-                    passwordField.setText(password);
-                    break; // No need to continue reading once the user is found
+            while ((line = br.readLine()) != null) {
+                // Format: ID,Password,Role,Name,Email
+                String[] parts = line.split(",");
+                if (parts[0].trim().equalsIgnoreCase(id)) {
+                    // Assuming parts[1] is Password, parts[3] is Name, parts[4] is Email
+                    // Adjust indices based on your ACTUAL file format
+                    if (parts.length > 3) nameField.setText(parts[3]);
+                    if (parts.length > 4) emailField.setText(parts[4]);
+                    if (parts.length > 1) passwordField.setText(parts[1]);
+                    return;
                 }
             }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // Function to save the updated user data back to the file
-    private void saveUserDataToFile() {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("user.txt"));
-
-            // Iterate through all users in UserDatabase and write them back to the file
-            for (UserProfile user : UserDatabase.getUsers().values()) {
-                String userLine = user.getUserID() + "," + user.getName() + "," + user.getEmail() + ","
-                        + user.getPassword();
-                writer.write(userLine);
-                writer.newLine();
+    // --- Helper: Read ALL lines, Update ONE line, Write ALL back ---
+    private void updateUserInFile(String id, String newName, String newEmail, String newPass) {
+        ArrayList<String> allLines = new ArrayList<>();
+        
+        // 1. Read all lines into memory
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts[0].trim().equalsIgnoreCase(id)) {
+                    // This is the user we are updating!
+                    // Reconstruct the line with NEW values
+                    // Keep ID (0) and Role (2) the same. Update Pass (1), Name (3), Email (4)
+                    String role = parts[2]; 
+                    String newLine = id + "," + newPass + "," + role + "," + newName + "," + newEmail;
+                    allLines.add(newLine);
+                } else {
+                    // Keep other users exactly as they are
+                    allLines.add(line);
+                }
             }
+        } catch (IOException e) { e.printStackTrace(); }
 
-            writer.close();
-            System.out.println("User data has been updated in the file.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // 2. Write everything back
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt"))) {
+            for (String line : allLines) {
+                bw.write(line);
+                bw.newLine();
+            }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

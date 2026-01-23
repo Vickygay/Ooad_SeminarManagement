@@ -1,9 +1,8 @@
 package views;
 
-import controllers.RegistrationController;
+import controllers.PresentationController;
 import java.awt.*;
 import javax.swing.*;
-import models.Registration;
 
 /**
  * StudentDashboardView provides the UI for seminar registration.
@@ -17,8 +16,10 @@ public class StudentDashboardView extends JFrame implements Dashboard {
     private JComboBox<String> typeCombo;
     private String selectedFilePath = "No file attached";
     private JLabel pathLabel;
+    private String currentStudentID;
 
-    public StudentDashboardView() {
+    public StudentDashboardView(String studentID) {
+        this.currentStudentID = studentID;
         super("FCI Seminar Management System - Student Dashboard");
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,13 +38,25 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         JPanel sidebar = new JPanel(new GridLayout(8, 1, 10, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         sidebar.setPreferredSize(new Dimension(220, 700));
-        sidebar.add(new JButton("Registration Form"));
-        sidebar.add(new JButton("View Award Nominations"));
+
+        JButton btnReg = new JButton("Registration Form");
+        JButton btnNom = new JButton("View Award Nominations");
+        JButton btnProfile = new JButton("Update Profile"); 
+        
+        sidebar.add(btnReg);
+        sidebar.add(btnNom);
+        sidebar.add(btnProfile);
+
         add(sidebar, BorderLayout.WEST);
 
         // Main Content Area: Registration Form
         JPanel mainContent = createRegistrationForm();
         add(new JScrollPane(mainContent), BorderLayout.CENTER);
+
+        btnProfile.addActionListener(e -> {
+            // Open the SAME ProfileUpdateView you made earlier
+            new ProfileUpdateView(currentStudentID).setVisible(true);
+        });
 
         setVisible(true);
     }
@@ -124,22 +137,20 @@ public class StudentDashboardView extends JFrame implements Dashboard {
                 return; // Stop execution
             }
 
-            // If valid, create model and save
-            Registration reg = new Registration(
-                titleStr,
-                abstractStr,
-                supervisorStr,
-                presentationType,
-                selectedFilePath
-            );
+        PresentationController controller = new PresentationController();
 
-            RegistrationController controller = new RegistrationController();
-            if (controller.saveRegistration(reg)) {
-                JOptionPane.showMessageDialog(this, "Registration Saved Successfully!");
-                clearForm();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error saving registration to database.", "System Error", JOptionPane.ERROR_MESSAGE);
-            }
+        controller.registerPresentation(
+            currentStudentID,   // Pass the ID!
+            titleStr, 
+            abstractStr, 
+            supervisorStr, 
+            presentationType, 
+            selectedFilePath    // Pass the File Path!
+        );
+
+        JOptionPane.showMessageDialog(this, "Registration Saved Successfully to System!");
+        clearForm();
+
         });
         formPanel.add(submitBtn, gbc);
 
