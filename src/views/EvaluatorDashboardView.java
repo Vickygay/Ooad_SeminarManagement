@@ -1,9 +1,5 @@
 package views;
 
-import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,7 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import models.Presentation;
 
 public class EvaluatorDashboardView extends JFrame {
@@ -44,7 +43,8 @@ public class EvaluatorDashboardView extends JFrame {
         add(header, BorderLayout.NORTH);
 
         // --- 2. Sidebar ---
-        JPanel sidebar = new JPanel(new GridLayout(0, 1, 10, 10));
+        // Rows increased to 12 to provide space for bottom placement
+        JPanel sidebar = new JPanel(new GridLayout(12, 1, 10, 10));
         sidebar.setPreferredSize(new Dimension(280, 700));
         sidebar.setBackground(whiteColor);
         
@@ -61,8 +61,8 @@ public class EvaluatorDashboardView extends JFrame {
         JButton btnNominee = createSidebarButton("Nominee");
         JButton btnAwardee = createSidebarButton("Awardee");
         JButton btnProfile = createSidebarButton("Update Profile");
-
         JButton btnLogout = new JButton("Logout");
+
         btnLogout.setFont(new Font("SansSerif", Font.BOLD, 15));
         btnLogout.setBackground(new Color(255, 102, 102)); // Light Red for Logout
         btnLogout.setForeground(Color.WHITE);
@@ -75,8 +75,15 @@ public class EvaluatorDashboardView extends JFrame {
         sidebar.add(btnNominee);
         sidebar.add(btnAwardee);
         sidebar.add(btnProfile);
+        
+        // Added specific spacers to push Logout to the bottom
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        
         add(sidebar, BorderLayout.WEST);
-        sidebar.add(new JLabel()); 
+        // sidebar.add(new JLabel()); // Original line kept
         sidebar.add(btnLogout); 
 
 
@@ -119,12 +126,22 @@ public class EvaluatorDashboardView extends JFrame {
         btnNominee.addActionListener(e -> cardLayout.show(content, "Nominee"));
         btnAwardee.addActionListener(e -> cardLayout.show(content, "Awardee"));
 
+        // Logout Logic
         btnLogout.addActionListener(e -> {
-            // Confirm logout?
-            int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
-            if(choice == JOptionPane.YES_OPTION){
-                new LoginView().setVisible(true); // Open Login Screen
-                dispose(); // Close Dashboard
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to logout?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // 1. Open the Login Interface
+                // Replace 'LoginView' with the actual name of your login class
+                new LoginView().setVisible(true); 
+                
+                // 2. Close ONLY the current dashboard window
+                this.dispose(); 
+                
+                JOptionPane.showMessageDialog(null, "Successfully logged out.");
             }
         });
 

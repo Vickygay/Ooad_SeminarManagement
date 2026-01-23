@@ -83,9 +83,13 @@ public class StudentDashboardView extends JFrame implements Dashboard {
                 JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                this.dispose(); // Close current dashboard
-                // If you have a LoginView, uncomment the line below:
-                // new LoginView().setVisible(true); 
+                // 1. Open the Login Interface
+                // Replace 'LoginView' with the actual name of your login class
+                new LoginView().setVisible(true); 
+                
+                // 2. Close ONLY the current dashboard window
+                this.dispose(); 
+                
                 JOptionPane.showMessageDialog(null, "Successfully logged out.");
             }
         });
