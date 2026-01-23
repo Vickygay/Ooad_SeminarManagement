@@ -2,6 +2,9 @@ package views;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.io.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
@@ -9,6 +12,9 @@ import java.text.DateFormat;
 public class CoordinatorDashboardView extends JFrame implements Dashboard {  // Implementing the Dashboard interface
 
     private String currentCoordinatorID;
+    private Color headerColor = new Color(51, 102, 0);
+    private Color sideBarColor = new Color(229, 255, 204);
+    private Color whiteColor = Color.WHITE;
 
     public CoordinatorDashboardView(String coordinatorID) {
         this.currentCoordinatorID = coordinatorID;
@@ -62,10 +68,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         JPanel manageSession = new ManageSession();
         
         // Seminar
-        JPanel seminarSchedule = new JPanel();
-        seminarSchedule.add(new JLabel("This is the generate schedule page."));
-        seminarSchedule.setBackground(new Color(255, 255, 255));
-        seminarSchedule.setOpaque(true);
+        JPanel seminarSchedule = new SchedulePanel();
         
         JPanel report = new JPanel();
         report.add(new JLabel("This is the generate report page."));
@@ -85,7 +88,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         add(content, BorderLayout.CENTER);
         // to change the content based on button selected
         btn1.addActionListener(e -> cardLayout.show(content, "Manage Seminar"));
-        btn2.addActionListener(e -> cardLayout.show(content, "Schedule"));
+        btn2.addActionListener(e -> {((SchedulePanel) seminarSchedule).loadScheduleData();cardLayout.show(content, "Schedule");});
         btn3.addActionListener(e -> cardLayout.show(content, "Report"));
         btn4.addActionListener(e -> cardLayout.show(content, "Nomination"));
 
@@ -277,5 +280,111 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             gbc.fill = GridBagConstraints.BOTH;
             add(new JLabel(), gbc);
         }
+    }
+//-------- Seminar Schedule Panel ----------------//
+    private class SchedulePanel extends JPanel {
+        private DefaultTableModel model;
+
+        public SchedulePanel() {
+            setLayout(new BorderLayout());
+            setBackground(whiteColor);
+            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+            JLabel lblTitle = new JLabel("Seminar Schedules");
+            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
+            lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+            add(lblTitle, BorderLayout.NORTH);
+
+            String[] cols = {"Date", "Type", "Venue", "Student", "Evaluator"};
+            model = new DefaultTableModel(cols, 0);
+            JTable table = new JTable(model);
+            styleTable(table);
+            
+            add(new JScrollPane(table), BorderLayout.CENTER);
+        }
+
+        public void loadScheduleData() {
+            model.setRowCount(0);
+            try (BufferedReader br = new BufferedReader(new FileReader("seminars.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Format: SessionType,Venue,Date,Evaluator,Student
+                    String[] p = line.split(",");
+                    if (p.length >= 5) {
+                        model.addRow(new Object[]{p[2], p[0], p[1], p[4], p[3]});
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("No seminars found.");
+            }
+        }
+    }
+
+//-------- Report Panel ----------------//
+    private class ReportPanel extends JPanel {
+        private DefaultTableModel model;
+
+        public ReportPanel() {
+            setLayout(new BorderLayout());
+            setBackground(whiteColor);
+            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+            JLabel lblTitle = new JLabel("Final Evaluation Reports");
+            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
+            lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+            add(lblTitle, BorderLayout.NORTH);
+
+            String[] cols = {"Student ID", "Total Score (Max 20)", "Status"};
+            model = new DefaultTableModel(cols, 0);
+            JTable table = new JTable(model);
+            styleTable(table);
+
+            add(new JScrollPane(table), BorderLayout.CENTER);
+        }
+
+        public void generateReportData() {
+            model.setRowCount(0);
+            // Reads evaluations.txt and extracts scores
+            try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
+                String line;
+                String currentStudent = null;
+                String currentScore = null;
+
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Student ID:")) {
+                        // Parse "EVALUATION RECORD | ... | Student ID: std123"
+                        String[] parts = line.split("Student ID:");
+                        if (parts.length > 1) currentStudent = parts[1].trim();
+                    } 
+                    else if (line.contains("TOTAL SCORE:")) {
+                        // Parse "TOTAL SCORE: 17.00 / 20.00"
+                        String[] parts = line.split("/");
+                        String scorePart = parts[0].replace("TOTAL SCORE:", "").trim();
+                        currentScore = scorePart;
+                    }
+
+                    // Once we have both ID and Score, add to table
+                    if (currentStudent != null && currentScore != null) {
+                        double scoreVal = Double.parseDouble(currentScore);
+                        String status = (scoreVal >= 10) ? "Pass" : "Fail"; // Pass if >= 50%
+                        model.addRow(new Object[]{currentStudent, currentScore, status});
+                        
+                        currentStudent = null;
+                        currentScore = null;
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore errors
+            }
+        }
+    }
+
+    private void styleTable(JTable table) {
+            JTableHeader header = table.getTableHeader();
+            header.setBackground(headerColor);
+            header.setForeground(Color.WHITE);
+            header.setFont(new Font("SansSerif", Font.BOLD, 14));
+            table.setRowHeight(25);
+            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
     }
 }
