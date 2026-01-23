@@ -8,7 +8,10 @@ import java.text.DateFormat;
 
 public class CoordinatorDashboardView extends JFrame implements Dashboard {  // Implementing the Dashboard interface
 
-    public CoordinatorDashboardView() {
+    private String currentCoordinatorID;
+
+    public CoordinatorDashboardView(String coordinatorID) {
+        this.currentCoordinatorID = coordinatorID;
         super("FCI Seminar Management System - Coordinator Dashboard");
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,17 +35,22 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         JButton btn2 = new JButton("Seminar Schedules");
         JButton btn3 = new JButton("Final evaluation reports");
         JButton btn4 = new JButton("Oversee Nomination");
+        JButton btn5 = new JButton("Update Profile");
+        
 
         Color greenColor = new Color(229, 255, 204);
         btn1.setBackground(greenColor);
         btn2.setBackground(greenColor);
         btn3.setBackground(greenColor);
         btn4.setBackground(greenColor);
+        btn5.setBackground(greenColor);
 
         sidebar.add(btn1);
         sidebar.add(btn2);
         sidebar.add(btn3);
         sidebar.add(btn4);
+        sidebar.add(btn5);
+
         add(sidebar, BorderLayout.WEST);
         // Panel for content
         JPanel content = new JPanel();
@@ -80,6 +88,8 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         btn2.addActionListener(e -> cardLayout.show(content, "Schedule"));
         btn3.addActionListener(e -> cardLayout.show(content, "Report"));
         btn4.addActionListener(e -> cardLayout.show(content, "Nomination"));
+
+        btn5.addActionListener(e -> {new ProfileUpdateView(currentCoordinatorID).setVisible(true);});
 
         setVisible(true);
     }

@@ -1,28 +1,36 @@
 package controllers;
 
-import views.LoginView;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class LoginController {
-    private LoginView view; // Corrected variable name
 
-    // Constructor to initialize the controller with the view
-    public LoginController(LoginView view) {
-        this.view = view;
+    public LoginController() {
     }
 
-    // Add method to handle login (this can be extended)
-    public boolean validateLogin(String userID, String password) {
-        // Example: Validate user input with hardcoded values
-        if (userID.equals("admin") && password.equals("admin")) {
-            // If login is successful, you can update the view (e.g., navigate to the next screen)
-            view.showWelcomeScreen(); // Example method to show next screen
-            return true;
-        } else {
-            // If login fails, you can show an error on the view
-            view.showErrorMessage("Invalid login credentials!");
-            return false;
+    // Returns the ROLE if login is successful, or NULL if failed
+    public String validateLogin(String userID, String password) {
+        String line;
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(","); 
+                
+                // Check if line has enough data (ID, Pass, Role...)
+                if (data.length >= 3) {
+                    String fUser = data[0].trim();
+                    String fPass = data[1].trim();
+                    String fRole = data[2].trim();
+
+                    // Check Credentials
+                    if (fUser.equals(userID) && fPass.equals(password)) {
+                        return fRole; // Success: Return the role (e.g., "Student")
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading users.txt file.");
         }
+        return null; // Failure: User not found or password mismatch
     }
-
-    // More methods can be added to handle other logic
 }

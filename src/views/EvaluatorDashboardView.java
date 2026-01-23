@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
 import models.Presentation;
 
 public class EvaluatorDashboardView extends JFrame {
@@ -43,7 +44,7 @@ public class EvaluatorDashboardView extends JFrame {
         add(header, BorderLayout.NORTH);
 
         // --- 2. Sidebar ---
-        JPanel sidebar = new JPanel(new GridLayout(8, 1, 10, 10));
+        JPanel sidebar = new JPanel(new GridLayout(0, 1, 10, 10));
         sidebar.setPreferredSize(new Dimension(280, 700));
         sidebar.setBackground(whiteColor);
         
@@ -59,6 +60,7 @@ public class EvaluatorDashboardView extends JFrame {
         JButton btnNominate = createSidebarButton("Nominate Student");
         JButton btnNominee = createSidebarButton("Nominee");
         JButton btnAwardee = createSidebarButton("Awardee");
+        JButton btnProfile = createSidebarButton("Update Profile");
 
         JButton btnLogout = new JButton("Logout");
         btnLogout.setFont(new Font("SansSerif", Font.BOLD, 15));
@@ -72,9 +74,11 @@ public class EvaluatorDashboardView extends JFrame {
         sidebar.add(btnNominate);
         sidebar.add(btnNominee);
         sidebar.add(btnAwardee);
+        sidebar.add(btnProfile);
         add(sidebar, BorderLayout.WEST);
         sidebar.add(new JLabel()); 
         sidebar.add(btnLogout); 
+
 
         // --- 3. Content ---
         JPanel content = new JPanel();
@@ -122,6 +126,12 @@ public class EvaluatorDashboardView extends JFrame {
                 new LoginView().setVisible(true); // Open Login Screen
                 dispose(); // Close Dashboard
             }
+        });
+
+        btnProfile.addActionListener(e -> {
+            // Open your NEW ProfileUpdateView
+            // We pass the ID so it knows who to load
+            new ProfileUpdateView(currentEvaluatorID).setVisible(true);
         });
 
         setVisible(true);
