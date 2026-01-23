@@ -3,7 +3,7 @@ admin,a3,Coordinator,Chan Ker Jing,chan@coordinator.com
 coordinator1,c3,Coordinator
 
 Student
-std111221,s3,Student
+std111221,,Student,,
 std00001,s1,Student,Kelvin Choo,kelvin@student.com
 std00002,s2,Student
 std00003,s3,Student

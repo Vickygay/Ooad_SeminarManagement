@@ -35,17 +35,34 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         add(header, BorderLayout.NORTH);
 
         // Sidebar Navigation
-        JPanel sidebar = new JPanel(new GridLayout(8, 1, 10, 10));
+        // Increased grid rows to 10 to provide better spacing for the Logout button
+        JPanel sidebar = new JPanel(new GridLayout(10, 1, 10, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         sidebar.setPreferredSize(new Dimension(220, 700));
 
         JButton btnReg = new JButton("Registration Form");
         JButton btnNom = new JButton("View Award Nominations");
         JButton btnProfile = new JButton("Update Profile"); 
+        JButton btnLogout = new JButton("Logout"); 
+
+        // Styling Logout Button
+        btnLogout.setBackground(new Color(231, 76, 60)); // Red color
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnLogout.setFocusPainted(false);
         
         sidebar.add(btnReg);
         sidebar.add(btnNom);
         sidebar.add(btnProfile);
+        
+        // Spacer labels to push Logout to the bottom area
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(btnLogout);
 
         add(sidebar, BorderLayout.WEST);
 
@@ -53,9 +70,24 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         JPanel mainContent = createRegistrationForm();
         add(new JScrollPane(mainContent), BorderLayout.CENTER);
 
+        // Action Listeners
         btnProfile.addActionListener(e -> {
-            // Open the SAME ProfileUpdateView you made earlier
             new ProfileUpdateView(currentStudentID).setVisible(true);
+        });
+
+        // Logout Logic
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to logout?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                this.dispose(); // Close current dashboard
+                // If you have a LoginView, uncomment the line below:
+                // new LoginView().setVisible(true); 
+                JOptionPane.showMessageDialog(null, "Successfully logged out.");
+            }
         });
 
         setVisible(true);
@@ -114,19 +146,17 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         JButton submitBtn = new JButton("Register for Seminar");
         submitBtn.setPreferredSize(new Dimension(150, 40));
         submitBtn.addActionListener(e -> {
-            // Get data and trim whitespace
             String titleStr = titleField.getText().trim();
             String abstractStr = abstractArea.getText().trim();
             String supervisorStr = supervisorField.getText().trim();
             String presentationType = (String) typeCombo.getSelectedItem();
 
-            // Perform Validation Check
             if (titleStr.isEmpty() || abstractStr.isEmpty() || supervisorStr.isEmpty()) {
                 JOptionPane.showMessageDialog(this, 
                     "Error: All text fields must be filled out.", 
                     "Incomplete Form", 
                     JOptionPane.ERROR_MESSAGE);
-                return; // Stop execution
+                return;
             }
 
             if (selectedFilePath.equals("No file attached")) {
@@ -134,23 +164,21 @@ public class StudentDashboardView extends JFrame implements Dashboard {
                     "Error: Please upload your presentation slide or poster.", 
                     "Missing File", 
                     JOptionPane.ERROR_MESSAGE);
-                return; // Stop execution
+                return;
             }
 
-        PresentationController controller = new PresentationController();
+            PresentationController controller = new PresentationController();
+            controller.registerPresentation(
+                currentStudentID, 
+                titleStr, 
+                abstractStr, 
+                supervisorStr, 
+                presentationType, 
+                selectedFilePath
+            );
 
-        controller.registerPresentation(
-            currentStudentID,   // Pass the ID!
-            titleStr, 
-            abstractStr, 
-            supervisorStr, 
-            presentationType, 
-            selectedFilePath    // Pass the File Path!
-        );
-
-        JOptionPane.showMessageDialog(this, "Registration Saved Successfully to System!");
-        clearForm();
-
+            JOptionPane.showMessageDialog(this, "Registration Saved Successfully to System!");
+            clearForm();
         });
         formPanel.add(submitBtn, gbc);
 

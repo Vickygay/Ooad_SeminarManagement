@@ -25,7 +25,7 @@ public class PresentationController {
         }
 
         // Save to presentations.txt
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("presentations.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("registrations.txt", true))) {
             // Format: StudentID | Title | Type | Supervisor | Abstract | FilePath
             String line = String.format("%s|%s|%s|%s|%s|%s", 
                 studentID, title, presentationType, supervisor, abstractText, filePath);
