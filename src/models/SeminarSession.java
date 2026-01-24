@@ -1,4 +1,6 @@
 package models;
+import java.io.*;
+import java.util.ArrayList;
 
 public class SeminarSession {
     private String sessionID;
@@ -23,5 +25,22 @@ public class SeminarSession {
         System.out.println("Session Type: " + this.sessionType);
 
         // You could also save this information to a database or a file if needed
+    }
+
+    public static ArrayList<String[]> getAllSeminars() {
+        ArrayList<String[]> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("seminars.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // File format: Type,Venue,Date,Evaluator,Student
+                String[] parts = line.split(",");
+                if (parts.length >= 5) {
+                    list.add(parts);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading seminars: " + e.getMessage());
+        }
+        return list;
     }
 }
