@@ -6,6 +6,8 @@ import java.io.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 
@@ -70,15 +72,9 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         // Seminar
         JPanel seminarSchedule = new SchedulePanel();
         
-        JPanel report = new JPanel();
-        report.add(new JLabel("This is the generate report page."));
-        report.setBackground(new Color(255, 255, 255));
-        report.setOpaque(true);
+        JPanel report = new ReportPanel();
 
-        JPanel nomination = new JPanel();
-        nomination.add(new JLabel("This is the oversee nomination page."));
-        nomination.setBackground(new Color(255, 255, 255));
-        nomination.setOpaque(true); 
+        JPanel nomination = new NominationPanel();
 
         content.add(manageSession, "Manage Seminar");
         content.add(seminarSchedule, "Schedule");
@@ -89,8 +85,8 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         // to change the content based on button selected
         btn1.addActionListener(e -> cardLayout.show(content, "Manage Seminar"));
         btn2.addActionListener(e -> {((SchedulePanel) seminarSchedule).loadScheduleData();cardLayout.show(content, "Schedule");});
-        btn3.addActionListener(e -> cardLayout.show(content, "Report"));
-        btn4.addActionListener(e -> cardLayout.show(content, "Nomination"));
+        btn3.addActionListener(e -> {((ReportPanel) report).generateReportData();cardLayout.show(content, "Report");});
+        btn4.addActionListener(e -> {((NominationPanel) nomination).calculateNominations();cardLayout.show(content, "Nomination");});
 
         btn5.addActionListener(e -> {new ProfileUpdateView(currentCoordinatorID).setVisible(true);});
 
@@ -376,6 +372,105 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             } catch (Exception e) {
                 // Ignore errors
             }
+        }
+    }
+
+//-------- Nomination Panel ----------------//
+    private class NominationPanel extends JPanel {
+        private JTextArea resultsArea;
+
+        public NominationPanel() {
+            setLayout(new BorderLayout());
+            setBackground(whiteColor);
+            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+            JLabel lblTitle = new JLabel("Award Nominations Overseer");
+            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
+            add(lblTitle, BorderLayout.NORTH);
+
+            resultsArea = new JTextArea();
+            resultsArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+            resultsArea.setEditable(false);
+            resultsArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            
+            add(new JScrollPane(resultsArea), BorderLayout.CENTER);
+        }
+
+        public void calculateNominations() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("=== AWARD NOMINATION REPORT ===\n\n");
+
+            // 1. Map StudentID -> Session Type
+            Map<String, String> studentTypes = new HashMap<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("seminars.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] p = line.split(",");
+                    if (p.length >= 5) {
+                        studentTypes.put(p[4].trim(), p[0].trim());
+                    }
+                }
+            } catch (Exception e) {}
+
+            // 2. Map StudentID -> Highest Score
+            Map<String, Double> scores = new HashMap<>();
+            try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
+                String line;
+                String currentStudent = null;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("Student ID:")) {
+                        currentStudent = line.split("Student ID:")[1].trim();
+                    } else if (line.contains("TOTAL SCORE:") && currentStudent != null) {
+                        String s = line.split("/")[0].replace("TOTAL SCORE:", "").trim();
+                        double score = Double.parseDouble(s);
+                        if (score > scores.getOrDefault(currentStudent, 0.0)) {
+                            scores.put(currentStudent, score);
+                        }
+                    }
+                }
+            } catch (Exception e) {}
+
+            // 3. Determine Winners
+            String bestOral = "None";
+            double maxOral = -1.0;
+            String bestPoster = "None";
+            double maxPoster = -1.0;
+            String peoplesChoice = "None"; 
+            double maxOverall = -1.0;
+
+            for (Map.Entry<String, Double> entry : scores.entrySet()) {
+                String std = entry.getKey();
+                Double score = entry.getValue();
+                String type = studentTypes.getOrDefault(std, "Unknown");
+
+                if (score > maxOverall) {
+                    maxOverall = score;
+                    peoplesChoice = std + " (" + score + ")";
+                }
+
+                if (type.contains("Paper") || type.contains("Oral")) { 
+                    if (score > maxOral) {
+                        maxOral = score;
+                        bestOral = std + " (" + score + ")";
+                    }
+                } else if (type.contains("Poster")) { 
+                    if (score > maxPoster) {
+                        maxPoster = score;
+                        bestPoster = std + " (" + score + ")";
+                    }
+                }
+            }
+
+            sb.append("BEST ORAL PRESENTATION:\n");
+            sb.append("   Winner: ").append(bestOral).append("\n\n");
+
+            sb.append("BEST POSTER PRESENTATION:\n");
+            sb.append("   Winner: ").append(bestPoster).append("\n\n");
+
+            sb.append("PEOPLE'S CHOICE AWARD:\n");
+            sb.append("   Winner: ").append(peoplesChoice).append("\n\n");
+
+            resultsArea.setText(sb.toString());
         }
     }
 
