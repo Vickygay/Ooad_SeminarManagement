@@ -6,14 +6,12 @@ import javax.swing.*;
 import java.io.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.*;
+import controllers.SeminarSessionController;
+import controllers.ReportController;
 
 public class CoordinatorDashboardView extends JFrame implements Dashboard {  // Implementing the Dashboard interface
 
@@ -301,7 +299,8 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
     }
 //-------- Seminar Schedule Panel ----------------//
     private class SchedulePanel extends JPanel {
-        private DefaultTableModel model;
+        private JTable table;
+        private SeminarSessionController controller = new SeminarSessionController(); // Use Controller
 
         public SchedulePanel() {
             setLayout(new BorderLayout());
@@ -313,34 +312,26 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
             add(lblTitle, BorderLayout.NORTH);
 
-            String[] cols = {"Date", "Type", "Venue", "Student", "Evaluator"};
-            model = new DefaultTableModel(cols, 0);
-            JTable table = new JTable(model);
-            styleTable(table);
-            
+            table = new JTable();
+            styleTable(table); // Your existing style helper
             add(new JScrollPane(table), BorderLayout.CENTER);
+            
+            loadScheduleData(); // Initial load
         }
 
         public void loadScheduleData() {
-            model.setRowCount(0);
-            try (BufferedReader br = new BufferedReader(new FileReader("seminars.txt"))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    // Format: SessionType,Venue,Date,Evaluator,Student
-                    String[] p = line.split(",");
-                    if (p.length >= 5) {
-                        model.addRow(new Object[]{p[2], p[0], p[1], p[4], p[3]});
-                    }
-                }
-            } catch (IOException e) {
-                System.out.println("No seminars found.");
-            }
+            // VIEW ASKS CONTROLLER for the model
+            table.setModel(controller.getScheduleModel());
+            
+            // Re-apply style because setting model can reset column widths
+            styleTable(table); 
         }
     }
 
 //-------- Report Panel ----------------//
     private class ReportPanel extends JPanel {
-        private DefaultTableModel model;
+        private JTable table;
+        private ReportController controller = new ReportController(); // Use Controller
 
         public ReportPanel() {
             setLayout(new BorderLayout());
@@ -352,54 +343,22 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
             add(lblTitle, BorderLayout.NORTH);
 
-            String[] cols = {"Student ID", "Total Score (Max 20)", "Status"};
-            model = new DefaultTableModel(cols, 0);
-            JTable table = new JTable(model);
+            table = new JTable();
             styleTable(table);
-
             add(new JScrollPane(table), BorderLayout.CENTER);
         }
 
         public void generateReportData() {
-            model.setRowCount(0);
-            // Reads evaluations.txt and extracts scores
-            try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
-                String line;
-                String currentStudent = null;
-                String currentScore = null;
-
-                while ((line = br.readLine()) != null) {
-                    if (line.contains("Student ID:")) {
-                        // Parse "EVALUATION RECORD | ... | Student ID: std123"
-                        String[] parts = line.split("Student ID:");
-                        if (parts.length > 1) currentStudent = parts[1].trim();
-                    } 
-                    else if (line.contains("TOTAL SCORE:")) {
-                        // Parse "TOTAL SCORE: 17.00 / 20.00"
-                        String[] parts = line.split("/");
-                        String scorePart = parts[0].replace("TOTAL SCORE:", "").trim();
-                        currentScore = scorePart;
-                    }
-
-                    // Once we have both ID and Score, add to table
-                    if (currentStudent != null && currentScore != null) {
-                        double scoreVal = Double.parseDouble(currentScore);
-                        String status = (scoreVal >= 10) ? "Pass" : "Fail"; // Pass if >= 50%
-                        model.addRow(new Object[]{currentStudent, currentScore, status});
-                        
-                        currentStudent = null;
-                        currentScore = null;
-                    }
-                }
-            } catch (Exception e) {
-                // Ignore errors
-            }
+             // VIEW ASKS CONTROLLER
+            table.setModel(controller.getEvaluationModel());
+            styleTable(table);
         }
     }
 
 //-------- Nomination Panel ----------------//
     private class NominationPanel extends JPanel {
         private JTextArea resultsArea;
+        private ReportController controller = new ReportController(); // Use Controller
 
         public NominationPanel() {
             setLayout(new BorderLayout());
@@ -414,94 +373,23 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             resultsArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
             resultsArea.setEditable(false);
             resultsArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            
             add(new JScrollPane(resultsArea), BorderLayout.CENTER);
         }
 
         public void calculateNominations() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("=== AWARD NOMINATION REPORT ===\n\n");
-
-            // 1. Map StudentID -> Session Type
-            Map<String, String> studentTypes = new HashMap<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("seminars.txt"))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] p = line.split(",");
-                    if (p.length >= 5) {
-                        studentTypes.put(p[4].trim(), p[0].trim());
-                    }
-                }
-            } catch (Exception e) {}
-
-            // 2. Map StudentID -> Highest Score
-            Map<String, Double> scores = new HashMap<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
-                String line;
-                String currentStudent = null;
-                while ((line = br.readLine()) != null) {
-                    if (line.contains("Student ID:")) {
-                        currentStudent = line.split("Student ID:")[1].trim();
-                    } else if (line.contains("TOTAL SCORE:") && currentStudent != null) {
-                        String s = line.split("/")[0].replace("TOTAL SCORE:", "").trim();
-                        double score = Double.parseDouble(s);
-                        if (score > scores.getOrDefault(currentStudent, 0.0)) {
-                            scores.put(currentStudent, score);
-                        }
-                    }
-                }
-            } catch (Exception e) {}
-
-            // 3. Determine Winners
-            String bestOral = "None";
-            double maxOral = -1.0;
-            String bestPoster = "None";
-            double maxPoster = -1.0;
-            String peoplesChoice = "None"; 
-            double maxOverall = -1.0;
-
-            for (Map.Entry<String, Double> entry : scores.entrySet()) {
-                String std = entry.getKey();
-                Double score = entry.getValue();
-                String type = studentTypes.getOrDefault(std, "Unknown");
-
-                if (score > maxOverall) {
-                    maxOverall = score;
-                    peoplesChoice = std + " (" + score + ")";
-                }
-
-                if (type.contains("Paper") || type.contains("Oral")) { 
-                    if (score > maxOral) {
-                        maxOral = score;
-                        bestOral = std + " (" + score + ")";
-                    }
-                } else if (type.contains("Poster")) { 
-                    if (score > maxPoster) {
-                        maxPoster = score;
-                        bestPoster = std + " (" + score + ")";
-                    }
-                }
-            }
-
-            sb.append("BEST ORAL PRESENTATION:\n");
-            sb.append("   Winner: ").append(bestOral).append("\n\n");
-
-            sb.append("BEST POSTER PRESENTATION:\n");
-            sb.append("   Winner: ").append(bestPoster).append("\n\n");
-
-            sb.append("PEOPLE'S CHOICE AWARD:\n");
-            sb.append("   Winner: ").append(peoplesChoice).append("\n\n");
-
-            resultsArea.setText(sb.toString());
+            // VIEW ASKS CONTROLLER
+            String report = controller.getNominationReport();
+            resultsArea.setText(report);
         }
     }
 
     private void styleTable(JTable table) {
-            JTableHeader header = table.getTableHeader();
-            header.setBackground(headerColor);
-            header.setForeground(Color.WHITE);
-            header.setFont(new Font("SansSerif", Font.BOLD, 14));
-            table.setRowHeight(25);
-            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        table.setRowHeight(30);
+        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JTableHeader h = table.getTableHeader();
+        h.setOpaque(true); 
+        h.setBackground(headerColor);
+        h.setForeground(Color.WHITE);
+        h.setFont(new Font("SansSerif", Font.BOLD, 15));
     }
 }
