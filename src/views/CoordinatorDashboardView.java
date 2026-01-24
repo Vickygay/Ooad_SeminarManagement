@@ -1,4 +1,5 @@
 package views;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,6 +11,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.*;
 
 public class CoordinatorDashboardView extends JFrame implements Dashboard {  // Implementing the Dashboard interface
 
@@ -36,22 +40,30 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         add(header, BorderLayout.NORTH);
 
         // Sidebar Navigation
-        JPanel sidebar = new JPanel(new GridLayout(8, 1, 10, 10));
+        // Increased rows to 12 to provide space to push Logout to the bottom
+        JPanel sidebar = new JPanel(new GridLayout(12, 1, 10, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         sidebar.setPreferredSize(new Dimension(220, 700));
+        
         JButton btn1 = new JButton("Manage Seminar Session");
         JButton btn2 = new JButton("Seminar Schedules");
         JButton btn3 = new JButton("Final evaluation reports");
         JButton btn4 = new JButton("Oversee Nomination");
         JButton btn5 = new JButton("Update Profile");
+        JButton btn6 = new JButton("Logout"); // Logout button initialized
         
-
         Color greenColor = new Color(229, 255, 204);
         btn1.setBackground(greenColor);
         btn2.setBackground(greenColor);
         btn3.setBackground(greenColor);
         btn4.setBackground(greenColor);
         btn5.setBackground(greenColor);
+        
+        // Styling Logout Button
+        btn6.setBackground(new Color(231, 76, 60)); // Red color
+        btn6.setForeground(Color.WHITE);
+        btn6.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn6.setFocusPainted(false);
 
         sidebar.add(btn1);
         sidebar.add(btn2);
@@ -59,7 +71,18 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         sidebar.add(btn4);
         sidebar.add(btn5);
 
+        // Added spacers to push the logout button to the bottom row
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        
+        sidebar.add(btn6); // Added logout button at the end
+
         add(sidebar, BorderLayout.WEST);
+        
         // Panel for content
         JPanel content = new JPanel();
         content.setBackground(new Color(255, 255, 255));
@@ -82,6 +105,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         content.add(nomination, "Nomination");
 
         add(content, BorderLayout.CENTER);
+        
         // to change the content based on button selected
         btn1.addActionListener(e -> cardLayout.show(content, "Manage Seminar"));
         btn2.addActionListener(e -> {((SchedulePanel) seminarSchedule).loadScheduleData();cardLayout.show(content, "Schedule");});
@@ -90,38 +114,52 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
 
         btn5.addActionListener(e -> {new ProfileUpdateView(currentCoordinatorID).setVisible(true);});
 
+        // Logout Logic
+        btn6.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to logout?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // 1. Open the Login Interface
+                // Replace 'LoginView' with the actual name of your login class
+                new LoginView().setVisible(true); 
+                
+                // 2. Close ONLY the current dashboard window
+                this.dispose(); 
+                
+                JOptionPane.showMessageDialog(null, "Successfully logged out.");
+            }
+        });
+
         setVisible(true);
     }
 
     @Override
     public void viewAwardee() {
-        // Logic for viewing awardee in the coordinator dashboard
         System.out.println("Viewing Coordinator Awardee...");
     }
 
     @Override
     public void viewNominates() {
-        // Logic for viewing nominations in the coordinator dashboard
         System.out.println("Viewing Coordinator Nominations...");
     }
 
-    private class ManageSession extends JPanel
-    {
-        private String[] getUsers(String role) 
-        {
+    private class ManageSession extends JPanel {
+        private String[] getUsers(String role) {
             java.util.ArrayList<String> list = new java.util.ArrayList<>();
-            list.add("-- Select " + role + " --"); // default option
+            list.add("-- Select " + role + " --");
 
             try {
                 java.util.Scanner sc = new java.util.Scanner(new java.io.File("users.txt"));
-                
-                while (sc.hasNextLine()) { //keep reading, until the end of the line
+                while (sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    String[] parts = line.split(","); //split parts by the ","
-                    
+                    String[] parts = line.split(",");
+
                     // parts[2] means the 3rd element in the users.txt, which is the role
                     if (parts.length >= 3 && parts[2].trim().equalsIgnoreCase(role)) {
-                        list.add(parts[0].trim()); //extract out the roles
+                        list.add(parts[0].trim());
                     }
                 }
                 sc.close();
@@ -129,14 +167,11 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
                 // If error, just ignore or print to console
                 System.out.println("File error"); 
             }
-            
             // convert into array, to be put into the dropdown list later
             return list.toArray(new String[0]);
         }
 
-
-        public ManageSession()
-        {
+        public ManageSession() {
             setLayout(new GridBagLayout());
             setBackground(new Color(255, 255, 255));
             setOpaque(true);
@@ -153,11 +188,11 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             gbc.gridwidth = 2; //span two column
             add(title1, gbc);
            
-            //Session Type
+           //Session Type
             gbc.gridwidth = 1;
             gbc.gridy++; //go to next row
             gbc.gridx = 0;
-                
+
             JLabel sessionTitle = new JLabel("Session Type:");
             sessionTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
             add(sessionTitle, gbc);
@@ -165,12 +200,10 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             gbc.gridx = 1;
             String[] sessionType = {"Paper Presentation Session", "Expert Lecture", "Poster Session"};
             JComboBox<String> cb = new JComboBox<>(sessionType);
-            cb.setVisible(true);
             add(cb, gbc);
 
             // Venue
-            gbc.gridy++;
-            gbc.gridx = 0;
+            gbc.gridy++; gbc.gridx = 0;
             JLabel venueTitle = new JLabel("Venue:");
             venueTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
             add(venueTitle, gbc);
@@ -180,7 +213,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             add(venueTextField, gbc);
 
             // Date
-            gbc.gridy++;
+            gbc.gridy++; 
             gbc.gridx = 0;
             JLabel dateTitle = new JLabel("Date:");
             dateTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
@@ -193,10 +226,10 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             dateField.setColumns(10);
             add(dateField, gbc);
 
-            // Assign Evaluator 
+            // Assign Evaluator
             gbc.gridy++; //go to next row
             gbc.gridx = 0;
-                
+
             JLabel assignEvaluator = new JLabel("Evaluator:");
             assignEvaluator.setFont(new Font("SansSerif", Font.BOLD, 15));
             add(assignEvaluator, gbc);
@@ -204,25 +237,22 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             gbc.gridx = 1;
             String[] evaluators = getUsers("Evaluator"); //get only the role evaluator
             JComboBox<String> evaluatorBox = new JComboBox<>(evaluators);
-            evaluatorBox.setVisible(true);
             add(evaluatorBox, gbc);
 
             // Assign Students
             gbc.gridy++; //go to next row
             gbc.gridx = 0;
-                
             JLabel assignStudent = new JLabel("Student involved:"); 
             assignStudent.setFont(new Font("SansSerif", Font.BOLD, 15));
             add(assignStudent, gbc);
             
             gbc.gridx = 1;
-            String[] students = getUsers("Student"); //get only the role student
+            String[] students = getUsers("Student");
             JComboBox<String> studentBox = new JComboBox<>(students);
-            studentBox.setVisible(true);
             add(studentBox, gbc);        
            
-            // Save button that will fetch all data and then save to text file
-            gbc.gridy++;
+           // Save button that will fetch all data and then save to text file
+            gbc.gridy++; 
             gbc.gridx = 1;
             gbc.anchor = GridBagConstraints.WEST;
             JButton submit = new JButton("Save");
@@ -232,46 +262,38 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
 
             submit.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    String selectedSessionType = (String) cb.getSelectedItem();
+                public void actionPerformed(ActionEvent e) {
                     String venue = venueTextField.getText();
                     String date = dateField.getText();
-                    String selectedEvaluator = (String) evaluatorBox.getSelectedItem();
-                    String selectedStudent = (String) studentBox.getSelectedItem();
 
-                    if(venue.isEmpty() || date.isEmpty())
-                    {
+                    if(venue.isEmpty() || date.isEmpty()) {
                         JOptionPane.showMessageDialog(ManageSession.this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
-                    try
-                    {
-                        java.io.FileWriter writer = new java.io.FileWriter("seminars.txt", true); //write info into seminars.txt
+                    try {
+                        java.io.FileWriter writer = new java.io.FileWriter("seminars.txt", true);
                         java.io.BufferedWriter bufferedWriter = new java.io.BufferedWriter(writer);
 
                         // separate info by ","
-                        bufferedWriter.write(selectedSessionType + "," + venue + "," + date + "," + selectedEvaluator + "," + selectedStudent);
+                        bufferedWriter.write((String)cb.getSelectedItem() + "," + venue + "," + date + "," + (String)evaluatorBox.getSelectedItem() + "," + (String)studentBox.getSelectedItem());
                         bufferedWriter.newLine(); // move to next line
                         bufferedWriter.close();
 
                         JOptionPane.showMessageDialog(ManageSession.this, "Session Saved Successfully!");
-                        
+
                         // clear fields after reading
                         venueTextField.setText("");
-                        
-                        }
-                        catch (java.io.IOException ex) //display error message
-                        {
-                            JOptionPane.showMessageDialog(ManageSession.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                        }
+
+                    } catch (java.io.IOException ex) { //display error message
+                        JOptionPane.showMessageDialog(ManageSession.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
+                }
             });
             
             // added so that the form appearing on top left: move to next row, takes up remaining space
-            gbc.gridy++;
-            gbc.weightx = 1;
+            gbc.gridy++; 
+            gbc.weightx = 1; 
             gbc.weighty = 1;
             gbc.fill = GridBagConstraints.BOTH;
             add(new JLabel(), gbc);
