@@ -144,10 +144,12 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         System.out.println("Viewing Coordinator Nominations...");
     }
 
-    private class ManageSession extends JPanel {
-        private String[] getUsers(String role) {
+    private class ManageSession extends JPanel
+    {
+        private String[] getEvaluators() 
+        {
             java.util.ArrayList<String> list = new java.util.ArrayList<>();
-            list.add("-- Select " + role + " --");
+            list.add("-- Select Evaluator --"); // default option
 
             try {
                 java.util.Scanner sc = new java.util.Scanner(new java.io.File("users.txt"));
@@ -156,8 +158,8 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
                     String[] parts = line.split(",");
 
                     // parts[2] means the 3rd element in the users.txt, which is the role
-                    if (parts.length >= 3 && parts[2].trim().equalsIgnoreCase(role)) {
-                        list.add(parts[0].trim());
+                    if (parts.length >= 3 && parts[2].trim().equalsIgnoreCase("Evaluator")) {
+                        list.add(parts[0].trim()); //extract out the roles
                     }
                 }
                 sc.close();
@@ -169,7 +171,35 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             return list.toArray(new String[0]);
         }
 
-        public ManageSession() {
+        private String[] getStudents() 
+        {
+            java.util.ArrayList<String> list = new java.util.ArrayList<>();
+            list.add("-- Select student --"); // default option
+
+            try {
+                java.util.Scanner sc = new java.util.Scanner(new java.io.File("registrations.txt"));
+                
+                while (sc.hasNextLine()) { //keep reading, until the end of the line
+                    String line = sc.nextLine();
+                    String[] parts = line.split("\\|"); //split parts by the "|"
+                    
+                    // parts[0] means the 1st element in the registrations.txt, which is the student id
+                    if (parts.length >= 6) {
+                        list.add(parts[0].trim()); //extract out the roles
+                    }
+                }
+                sc.close();
+            } catch (Exception e) {
+                // If error, just ignore or print to console
+                System.out.println("File error"); 
+            }
+            
+            // convert into array, to be put into the dropdown list later
+            return list.toArray(new String[0]);
+        }
+
+        public ManageSession()
+        {
             setLayout(new GridBagLayout());
             setBackground(new Color(255, 255, 255));
             setOpaque(true);
@@ -196,7 +226,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             add(sessionTitle, gbc);
             
             gbc.gridx = 1;
-            String[] sessionType = {"Paper Presentation Session", "Expert Lecture", "Poster Session"};
+            String[] sessionType = {"Oral Session", "Poster Session"};
             JComboBox<String> cb = new JComboBox<>(sessionType);
             add(cb, gbc);
 
@@ -233,7 +263,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             add(assignEvaluator, gbc);
             
             gbc.gridx = 1;
-            String[] evaluators = getUsers("Evaluator"); //get only the role evaluator
+            String[] evaluators = getEvaluators(); //get only the role evaluator
             JComboBox<String> evaluatorBox = new JComboBox<>(evaluators);
             add(evaluatorBox, gbc);
 
@@ -245,7 +275,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             add(assignStudent, gbc);
             
             gbc.gridx = 1;
-            String[] students = getUsers("Student");
+            String[] students = getStudents(); //get only the role student
             JComboBox<String> studentBox = new JComboBox<>(students);
             add(studentBox, gbc);        
            
