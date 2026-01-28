@@ -517,7 +517,7 @@ public class EvaluatorDashboardView extends JFrame {
             bottomPanel.add(new JLabel("Select Award Category:"));
 
             // 2. Dropdown for Awards
-            String[] awards = {"Best Presenter Award", "Best Research Content", "Best Visuals (Poster/Slides)"};
+            String[] awards = {"Best Presenter Award", "Best Research Content", "People's Choice Award"};
             awardTypeCombo = new JComboBox<>(awards);
             awardTypeCombo.setPreferredSize(new Dimension(200, 30));
             bottomPanel.add(awardTypeCombo);
