@@ -226,7 +226,7 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
             add(sessionTitle, gbc);
             
             gbc.gridx = 1;
-            String[] sessionType = {"Paper Presentation Session", "Expert Lecture", "Poster Session"};
+            String[] sessionType = {"Oral Session", "Poster Session"};
             JComboBox<String> cb = new JComboBox<>(sessionType);
             add(cb, gbc);
 

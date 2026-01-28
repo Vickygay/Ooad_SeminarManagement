@@ -1,7 +1,1 @@
-<<<<<<< HEAD
-std111221|Chan|Hi|Hi|Hi|Oral
-std111223|Ker|hello|hello|hello|Poster|C:\Users\ASUS\Pictures\Screenshots\Screenshot 2025-05-30 202122.png
-std111224|Jing|hu|hu|u|Oral|No file attached
-std111225|Jing|abcd|dff|werfrfr|Oral|C:\Users\Acer\Downloads\Activity Diagram with Swimlane-Activity Diagram - Scholarship Committee (1).png
-=======
->>>>>>> master
+std111221|cbsd|Oral|fssfs|dfdsfg|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec01 Introduction.pptx
