@@ -9,9 +9,5 @@ std00002,s2,Student
 std00003,s3,Student
 
 Evaluator 
-//OLDDDDDD
-E120101,e3,Evaluator
-E1222,e1,Evaluator
-//NEWWWWWWW
 E001,e3,Evaluator,Vicky Pong,vicky@evaluator.com
 E002,e2,Evaluator,Juliana ,juliana@evaluator.com
