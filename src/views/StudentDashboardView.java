@@ -1,9 +1,8 @@
 package views;
 
-import controllers.RegistrationController;
+import controllers.PresentationController;
 import java.awt.*;
 import javax.swing.*;
-import models.Registration;
 
 /**
  * StudentDashboardView provides the UI for seminar registration.
@@ -17,8 +16,10 @@ public class StudentDashboardView extends JFrame implements Dashboard {
     private JComboBox<String> typeCombo;
     private String selectedFilePath = "No file attached";
     private JLabel pathLabel;
+    private String currentStudentID;
 
-    public StudentDashboardView() {
+    public StudentDashboardView(String studentID) {
+        this.currentStudentID = studentID;
         super("FCI Seminar Management System - Student Dashboard");
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -34,16 +35,64 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         add(header, BorderLayout.NORTH);
 
         // Sidebar Navigation
-        JPanel sidebar = new JPanel(new GridLayout(8, 1, 10, 10));
+        // Increased grid rows to 10 to provide better spacing for the Logout button
+        JPanel sidebar = new JPanel(new GridLayout(10, 1, 10, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         sidebar.setPreferredSize(new Dimension(220, 700));
-        sidebar.add(new JButton("Registration Form"));
-        sidebar.add(new JButton("View Award Nominations"));
+
+        JButton btnReg = new JButton("Registration Form");
+        JButton btnNom = new JButton("View Award Nominations");
+        JButton btnProfile = new JButton("Update Profile"); 
+        JButton btnLogout = new JButton("Logout"); 
+
+        // Styling Logout Button
+        btnLogout.setBackground(new Color(231, 76, 60)); // Red color
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btnLogout.setFocusPainted(false);
+        
+        sidebar.add(btnReg);
+        sidebar.add(btnNom);
+        sidebar.add(btnProfile);
+        
+        // Spacer labels to push Logout to the bottom area
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(new JLabel(""));
+        sidebar.add(btnLogout);
+
         add(sidebar, BorderLayout.WEST);
 
         // Main Content Area: Registration Form
         JPanel mainContent = createRegistrationForm();
         add(new JScrollPane(mainContent), BorderLayout.CENTER);
+
+        // Action Listeners
+        btnProfile.addActionListener(e -> {
+            new ProfileUpdateView(currentStudentID).setVisible(true);
+        });
+
+        // Logout Logic
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to logout?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // 1. Open the Login Interface
+                // Replace 'LoginView' with the actual name of your login class
+                new LoginView().setVisible(true); 
+                
+                // 2. Close ONLY the current dashboard window
+                this.dispose(); 
+                
+                JOptionPane.showMessageDialog(null, "Successfully logged out.");
+            }
+        });
 
         setVisible(true);
     }
@@ -101,19 +150,17 @@ public class StudentDashboardView extends JFrame implements Dashboard {
         JButton submitBtn = new JButton("Register for Seminar");
         submitBtn.setPreferredSize(new Dimension(150, 40));
         submitBtn.addActionListener(e -> {
-            // Get data and trim whitespace
             String titleStr = titleField.getText().trim();
             String abstractStr = abstractArea.getText().trim();
             String supervisorStr = supervisorField.getText().trim();
             String presentationType = (String) typeCombo.getSelectedItem();
 
-            // Perform Validation Check
             if (titleStr.isEmpty() || abstractStr.isEmpty() || supervisorStr.isEmpty()) {
                 JOptionPane.showMessageDialog(this, 
                     "Error: All text fields must be filled out.", 
                     "Incomplete Form", 
                     JOptionPane.ERROR_MESSAGE);
-                return; // Stop execution
+                return;
             }
 
             if (selectedFilePath.equals("No file attached")) {
@@ -121,25 +168,21 @@ public class StudentDashboardView extends JFrame implements Dashboard {
                     "Error: Please upload your presentation slide or poster.", 
                     "Missing File", 
                     JOptionPane.ERROR_MESSAGE);
-                return; // Stop execution
+                return;
             }
 
-            // If valid, create model and save
-            Registration reg = new Registration(
-                titleStr,
-                abstractStr,
-                supervisorStr,
-                presentationType,
+            PresentationController controller = new PresentationController();
+            controller.registerPresentation(
+                currentStudentID, 
+                titleStr, 
+                abstractStr, 
+                supervisorStr, 
+                presentationType, 
                 selectedFilePath
             );
 
-            RegistrationController controller = new RegistrationController();
-            if (controller.saveRegistration(reg)) {
-                JOptionPane.showMessageDialog(this, "Registration Saved Successfully!");
-                clearForm();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error saving registration to database.", "System Error", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(this, "Registration Saved Successfully to System!");
+            clearForm();
         });
         formPanel.add(submitBtn, gbc);
 

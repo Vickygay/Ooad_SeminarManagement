@@ -3,21 +3,21 @@ package views;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import controllers.LoginController; // Import the controller
 
 public class LoginView extends JFrame {
     private JTextField userIDField;
     private JPasswordField passwordField;
     private JButton loginButton;
-    private String validatedRole = null; // Stores role after successful file check
+    private LoginController controller; // Add Controller variable
 
     public LoginView() {
+        this.controller = new LoginController(); // Initialize Controller
+
         setTitle("Login System");
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centers the window
+        setLocationRelativeTo(null); 
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -30,8 +30,7 @@ public class LoginView extends JFrame {
         userIDLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         userIDField.setFont(new Font("Arial", Font.PLAIN, 16));
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         gbc.insets = new Insets(10, 10, 5, 10);
         panel.add(userIDLabel, gbc);
 
@@ -45,8 +44,7 @@ public class LoginView extends JFrame {
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 1;
         gbc.insets = new Insets(5, 10, 5, 10);
         panel.add(passwordLabel, gbc);
 
@@ -61,69 +59,40 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(20, 10, 10, 10);
         panel.add(loginButton, gbc);
 
+        getRootPane().setDefaultButton(loginButton);
         add(panel);
 
+        // --- BUTTON ACTION LISTENER ---
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String userID = userIDField.getText();
                 String password = new String(passwordField.getPassword());
 
-                if (validateLoginFromFile(userID, password)) {
-                    String role = getRole();
+                // 1. ASK CONTROLLER TO VALIDATE
+                String role = controller.validateLogin(userID, password);
 
+                if (role != null) {
+                    // 2. SUCCESS: Open the correct dashboard based on the returned role
                     JOptionPane.showMessageDialog(null, "Login Successful! Role: " + role);
 
-                    // Navigate based on role found in text file
                     if (role.equalsIgnoreCase("Student")) {
-                        new StudentDashboardView().setVisible(true);
-                    } else if (role.equalsIgnoreCase("Evaluator")) {
-                        new EvaluatorDashboardView().setVisible(true);
-                    } else if (role.equalsIgnoreCase("Coordinator")) {
-                        new CoordinatorDashboardView().setVisible(true);
+                        new StudentDashboardView(userID).setVisible(true);
+                    } 
+                    else if (role.equalsIgnoreCase("Evaluator")) {
+                        new EvaluatorDashboardView(userID).setVisible(true); 
+                    } 
+                    else if (role.equalsIgnoreCase("Coordinator")) {
+                        new CoordinatorDashboardView(userID).setVisible(true);
                     }
-                    dispose();
+                    dispose(); // Close Login Window
                 } else {
+                    // 3. FAILURE
                     showErrorMessage("Invalid credentials or user does not exist!");
                     clearFields();
                 }
             }
         });
-    }
-
-    /**
-     * Reads users.txt and checks if credentials match.
-     * Expected format: userID,password,role
-     */
-    private boolean validateLoginFromFile(String userID, String password) {
-        String line;
-        // Using try-with-resources to ensure the file closes automatically
-        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(","); // Split by comma
-                if (data.length == 3) {
-                    String fUser = data[0].trim();
-                    String fPass = data[1].trim();
-                    String fRole = data[2].trim();
-
-                    if (fUser.equals(userID) && fPass.equals(password)) {
-                        this.validatedRole = fRole; // Store the role for the dashboard logic
-                        return true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            showErrorMessage("Error: users.txt file not found in project root.");
-        }
-        return false;
-    }
-
-    public void showWelcomeScreen() {
-        this.setVisible(true);
-    }
-
-    private String getRole() {
-        return validatedRole;
     }
 
     public void showErrorMessage(String message) {
@@ -133,12 +102,5 @@ public class LoginView extends JFrame {
     public void clearFields() {
         userIDField.setText("");
         passwordField.setText("");
-    }
-
-    public static void main(String[] args) {
-        // Run UI on Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            new LoginView().setVisible(true);
-        });
     }
 }

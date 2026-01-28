@@ -1,7 +1,7 @@
 package views;
 
-import javax.swing.*;
 import controllers.ReportController;
+import javax.swing.*;
 
 public class ReportView extends JFrame {
     private JButton generateReportButton;
@@ -19,7 +19,7 @@ public class ReportView extends JFrame {
 
         generateReportButton.addActionListener(e -> {
             ReportController reportController = new ReportController();
-            reportController.generateReport();
+            reportController.getNominationReport();
         });
     }
 }

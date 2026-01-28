@@ -1,28 +1,43 @@
 package controllers;
 
-import views.PresentationView;
-import models.Student;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.JOptionPane;
 
 public class PresentationController {
-    private PresentationView view;
-    private Student student;
 
-    public PresentationController(PresentationView view, Student student) {
-        this.view = view;
-        this.student = student;
+    // Empty Constructor
+    public PresentationController() {
     }
 
-    public void registerPresentation(String title, String abstractText, String supervisor, String presentationType) {
-        // Set the presentation details for the student
-        student.setTitle(title);
-        student.setAbstractText(abstractText);
-        student.setSupervisorName(supervisor);
-        student.setPresentationType(presentationType);
+    // Register method that accepts 'filePath'
+    public void registerPresentation(String studentID, String title, String abstractText, String supervisor, String presentationType, String filePath) {
+        
+        if (studentID == null || title.isEmpty()) {
+            System.out.println("Invalid data");
+            return;
+        }
+        
+        // Handle null filePath (e.g., from PresentationView)
+        if (filePath == null) {
+            filePath = "No file attached";
+        }
 
-        // Register the presentation
-        student.registerPresentation();
+        // Save to presentations.txt
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("registrations.txt", true))) {
+            // Format: StudentID | Title | Type | Supervisor | Abstract | FilePath
+            String line = String.format("%s|%s|%s|%s|%s|%s", 
+                studentID, title, presentationType, supervisor, abstractText, filePath);
+            
+            writer.write(line);
+            writer.newLine();
+            
+            System.out.println("Saved presentation for: " + studentID);
 
-        // Update the view (this method needs to be defined in PresentationView)
-        view.updateView(); // Assuming your PresentationView has a method like this
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error saving to file: " + e.getMessage());
+        }
     }
 }

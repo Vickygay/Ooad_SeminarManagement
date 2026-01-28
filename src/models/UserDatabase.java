@@ -4,7 +4,7 @@ import java.util.*;
 import java.io.*;
 
 public class UserDatabase {
-    private static Map<String, UserProfile> users = new HashMap<>();
+    private static Map<String, User> users = new HashMap<>();
 
     // Load user information from a file when called
     public static void loadUsersFromFile() {
@@ -44,7 +44,7 @@ public class UserDatabase {
                     String email = userData[2];
                     String password = userData[3];
 
-                    users.put(userID, new UserProfile(userID, name, email, password));
+                    users.put(userID, new User(userID, name, email, password));
 
                     System.out.println("Added user: " + userID); // Debug message for adding user to the map
                 } else {
@@ -64,9 +64,9 @@ public class UserDatabase {
     }
 
     // Fetch a user by userID
-    public static UserProfile getUser(String userID) {
+    public static User getUser(String userID) {
         System.out.println("Fetching user with ID: " + userID); // Debug message when fetching user by ID
-        UserProfile user = users.get(userID);
+        User user = users.get(userID);
 
         if (user != null) {
             System.out.println("User found: " + user.getName()); // Debug message if user is found
@@ -78,7 +78,7 @@ public class UserDatabase {
     }
 
     // Getter for users map
-    public static Map<String, UserProfile> getUsers() {
+    public static Map<String, User> getUsers() {
         return users; // Return the map containing all users
     }
 }
