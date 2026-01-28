@@ -15,7 +15,3 @@ E1222,e1,Evaluator
 //NEWWWWWWW
 E001,e3,Evaluator,Vicky Pong,vicky@evaluator.com
 E002,e2,Evaluator,Juliana ,juliana@evaluator.com
-
-//EXTRAAAAAAAAAA
-//E003,e3,Evaluator
-//E004,e4,Evaluator
