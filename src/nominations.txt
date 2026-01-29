@@ -1,2 +1,1 @@
-std111221,E001,Best Presenter Award,Nominated
-std111221,E001,Best Visuals (Poster/Slides),Nominated
+std00004,E001,Best Oral,Nominated

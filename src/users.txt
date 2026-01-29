@@ -1,13 +1,14 @@
 Coordinator
-admin,a3,Coordinator,Chan Ker Jing,chan@coordinator.com
-coordinator1,c3,Coordinator,kerjing,jingkerchan@coordinator.com
+C1,c1,Coordinator,Chan Ker Jing,chan@coordinator.com
+C2,c2,Coordinator,kerjing,jingkerchan@coordinator.com
 
 Student
-std111221,s3,Student,,
 std00001,s1,Student,Kelvin Choo,kelvin@student.com
-std00002,s2,Student
-std00003,s3,Student
+std00002,s2,Student,Chan Wai Ming,waiming@student.com
+std00003,s3,Student,Justin Wong,justin@student.com
+std00004,s4,student,Ali Osman,ali@student.com
+std00005,s5,student,Khairil, khairil@student.com
 
 Evaluator 
-E001,e3,Evaluator,Vicky Pong,vicky@evaluator.com
-E002,e2,Evaluator,Juliana ,juliana@evaluator.com
+E001,e1,Evaluator,Vicky Pong,vicky@evaluator.com
+E002,e2,Evaluator,Juliana,juliana@evaluator.com

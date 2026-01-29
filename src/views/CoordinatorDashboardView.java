@@ -2,28 +2,33 @@ package views;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 
-public class CoordinatorDashboardView extends JFrame implements Dashboard 
-{  // Implementing the Dashboard interface
+public class CoordinatorDashboardView extends JFrame {  
 
     private String currentCoordinatorID;
     // to call the methods later
-    private ManageSession manageSession;
-    private SchedulePanel seminarSchedule;
-    private ReportPanel report;
-    private NominationPanel nomination;
+    private C_ManageSession manageSession;
+    private C_SchedulePanel seminarSchedule;
+    private C_ReportPanel report;
+    private P_NominationPanel nomination;
+    private P_AwardeePanel awardeePanel;
+
+    private Color headerColor = new Color(51, 102, 0);
+    private Color buttonColor = new Color(229, 255, 204);
+    private Color whiteColor = Color.WHITE;
 
     public CoordinatorDashboardView(String coordinatorID) {
         this.currentCoordinatorID = coordinatorID;
-        super("FCI Seminar Management System - Coordinator Dashboard");
+        super("FCI Seminar Management System - Coordinator Dashboard - Logged in as: " + coordinatorID);
         setSize(1300, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 255, 255));
+        getContentPane().setBackground(whiteColor);
 
         // Header Panel
         JPanel header = new JPanel();
-        header.setBackground(new Color(51, 102, 0));
+        header.setBackground(headerColor);
         JLabel title = new JLabel("Coordinator Portal: Seminar Management & Award Nomination Management");
         title.setForeground(Color.WHITE);
         title.setFont(new Font("SansSerif", Font.BOLD, 22));
@@ -33,33 +38,33 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard
         // Sidebar Navigation
         // Increased rows to 12 to provide space to push Logout to the bottom
         JPanel sidebar = new JPanel(new GridLayout(12, 1, 10, 10));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
-        sidebar.setPreferredSize(new Dimension(220, 700));
+        sidebar.setPreferredSize(new Dimension(280, 700));
+        sidebar.setBackground(whiteColor);
         
-        JButton btn1 = new JButton("Manage Seminar Session");
-        JButton btn2 = new JButton("Seminar Schedules");
-        JButton btn3 = new JButton("Final evaluation reports");
-        JButton btn4 = new JButton("Oversee Nomination");
-        JButton btn5 = new JButton("Update Profile");
-        JButton btn6 = new JButton("Logout"); // Logout button initialized
+        sidebar.setBorder(new CompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 0, 2, Color.LIGHT_GRAY), 
+            BorderFactory.createEmptyBorder(20, 10, 20, 10) 
+        ));
         
-        Color greenColor = new Color(229, 255, 204);
-        btn1.setBackground(greenColor);
-        btn2.setBackground(greenColor);
-        btn3.setBackground(greenColor);
-        btn4.setBackground(greenColor);
-        btn5.setBackground(greenColor);
+        JButton btn1 = createSidebarButton("Manage Seminar Session");
+        JButton btn2 = createSidebarButton("Seminar Schedules");
+        JButton btn3 = createSidebarButton("Final evaluation reports");
+        JButton btn4 = createSidebarButton("Nominee");
+        JButton btnAwardee = createSidebarButton("Awardee");
+        JButton btn5 = createSidebarButton("Update Profile");
+        JButton btn6 = new JButton("Logout"); 
         
         // Styling Logout Button
-        btn6.setBackground(new Color(231, 76, 60)); // Red color
+        btn6.setBackground(new Color(231, 76, 60)); 
         btn6.setForeground(Color.WHITE);
-        btn6.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn6.setFont(new Font("SansSerif", Font.BOLD, 15));
         btn6.setFocusPainted(false);
 
         sidebar.add(btn1);
         sidebar.add(btn2);
         sidebar.add(btn3);
         sidebar.add(btn4);
+        sidebar.add(btnAwardee);
         sidebar.add(btn5);
 
         // Added spacers to push the logout button to the bottom row
@@ -68,37 +73,57 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard
         sidebar.add(new JLabel(""));
         sidebar.add(new JLabel(""));
         sidebar.add(new JLabel(""));
-        sidebar.add(new JLabel(""));
         
-        sidebar.add(btn6); // Added logout button at the end
+        sidebar.add(btn6); 
 
         add(sidebar, BorderLayout.WEST);
         
         // Panel for content
         JPanel content = new JPanel();
-        content.setBackground(new Color(255, 255, 255));
+        content.setBackground(whiteColor);
         CardLayout cardLayout = new CardLayout();
         content.setLayout(cardLayout);
 
-        manageSession = new ManageSession();
-        seminarSchedule = new SchedulePanel();
-        report = new ReportPanel();
-        nomination = new NominationPanel();
+        manageSession = new C_ManageSession();
+        seminarSchedule = new C_SchedulePanel();
+        report = new C_ReportPanel();
+        nomination = new P_NominationPanel();
+        awardeePanel = new P_AwardeePanel();
 
         content.add(manageSession, "Manage Seminar");
         content.add(seminarSchedule, "Schedule");
         content.add(report, "Report");
         content.add(nomination, "Nomination");
+        content.add(awardeePanel, "Awardee");
 
         add(content, BorderLayout.CENTER);
         
         // to change the content based on button selected
         btn1.addActionListener(e -> cardLayout.show(content, "Manage Seminar"));
-        btn2.addActionListener(e -> {((SchedulePanel) seminarSchedule).loadScheduleData();cardLayout.show(content, "Schedule");});
-        btn3.addActionListener(e -> {((ReportPanel) report).generateReportData();cardLayout.show(content, "Report");});
-        btn4.addActionListener(e -> {((NominationPanel) nomination).calculateNominations();cardLayout.show(content, "Nomination");});
+        
+        btn2.addActionListener(e -> {
+            ((C_SchedulePanel) seminarSchedule).loadScheduleData();
+            cardLayout.show(content, "Schedule");
+        });
+        
+        btn3.addActionListener(e -> {
+            ((C_ReportPanel) report).generateReportData();
+            cardLayout.show(content, "Report");
+        });
+        
+        btn4.addActionListener(e -> {
+            ((P_NominationPanel) nomination).calculateNominations();
+            cardLayout.show(content, "Nomination");
+        });
 
-        btn5.addActionListener(e -> {new ProfileUpdateView(currentCoordinatorID).setVisible(true);});
+        btnAwardee.addActionListener(e -> {
+            awardeePanel.calculateWinners(); // Refresh data when clicked
+            cardLayout.show(content, "Awardee");
+        });
+
+        btn5.addActionListener(e -> {
+            new P_ProfileUpdateView(currentCoordinatorID).setVisible(true);
+        });
 
         // Logout Logic
         btn6.addActionListener(e -> {
@@ -108,13 +133,8 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard
                 JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                // 1. Open the Login Interface
-                // Replace 'LoginView' with the actual name of your login class
                 new LoginView().setVisible(true); 
-                
-                // 2. Close ONLY the current dashboard window
                 this.dispose(); 
-                
                 JOptionPane.showMessageDialog(null, "Successfully logged out.");
             }
         });
@@ -122,14 +142,12 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard
         setVisible(true);
     }
 
-    @Override
-    public void viewAwardee() {
-        System.out.println("Viewing Coordinator Awardee...");
+    private JButton createSidebarButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(buttonColor); 
+        btn.setFont(new Font("SansSerif", Font.BOLD, 15));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 200), 1)); 
+        return btn;
     }
-
-    @Override
-    public void viewNominates() {
-        System.out.println("Viewing Coordinator Nominations...");
-    }
-
 }
