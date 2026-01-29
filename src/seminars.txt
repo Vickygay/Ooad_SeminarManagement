@@ -1,7 +1,5 @@
-Poster Session,FCI BUILDING  CQAR1005,2026-01-29,E002,std00001
-Oral Session,abcd,2026-01-28,E001,std111221
-Poster Session,bfsdfg,2026-01-31,E001,std00001
-Oral Session,FOE,2026-01-31,E002,std00003
-Oral Session,Tamarind Square,2026-02-01,E001,std00001
-Oral Session,abcd,2026-01-28,E001,std111221
-Oral Session,abcde,2026-01-28,E001,std111221
+Poster Session,FCI B-11 ,2026-02-03,E001,std00001
+Oral Session,FCI B-14,2026-02-03,E002,std00002
+Oral Session,FCI B-14,2026-02-04,E002,std00003
+Oral Session,FCI B-11,2026-02-04,E001,std00004
+Poster,FCI B-14,2026-02-05,E002,std00005

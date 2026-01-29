@@ -1,4 +1,5 @@
-std111221|cbsd|Oral|fssfs|dfdsfg|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec01 Introduction.pptx
-std00001|Hello|Poster|dr chan|jbsdsjfsdjfnlsdgsg|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec01 Introduction.pptx
-std00002|Today is Thursday|Oral|Dr Chan|Today is Thursday very nice|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec12 DP Creational & Behavioural.pptx
-std00003|ABCDEFG|Poster|fsdfdsf|dffsdfsdf|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\Lab exercise.pdf
+std00001|Testing|Poster|Dr. Chan Ming Yu|Testing testing 123...|C:\Users\vicky\OneDrive\Documents\Ooad_assignment\Lab exercise.pdf
+std00002|Hello Good Day|Oral|Dr. Lim Niee|Hope that you have the Nice Day|C:\Users\vicky\OneDrive\Documents\Ooad_assignment\Final Assignment.pdf
+std00003|Possible|Oral|Dr. Ahmad bin Ismail|The only impossible journey is the one you never begin|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput1.txt
+std00004|Dream|Oral|Dr. Ravi a/l Muthu|A DREAM written down with a date becomes a GOAL. A goal broken down into steps becomes a PLAN. A plan backed by ACTION becomes REALITY|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput2.txt
+std00005|Persistance|Poster|Dr. Kong Han Lin|If you run into a wall, don't turn around and give up. Figure out how to climb it|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput3.txt
