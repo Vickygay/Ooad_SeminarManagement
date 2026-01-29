@@ -1,6 +1,6 @@
 Coordinator
 admin,a3,Coordinator,Chan Ker Jing,chan@coordinator.com
-coordinator1,c3,Coordinator
+coordinator1,c3,Coordinator,kerjing,jingkerchan@coordinator.com
 
 Student
 std111221,s3,Student,,
