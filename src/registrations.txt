@@ -1,2 +1,4 @@
 std111221|cbsd|Oral|fssfs|dfdsfg|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec01 Introduction.pptx
 std00001|Hello|Poster|dr chan|jbsdsjfsdjfnlsdgsg|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec01 Introduction.pptx
+std00002|Today is Thursday|Oral|Dr Chan|Today is Thursday very nice|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\lecture slides\Lec12 DP Creational & Behavioural.pptx
+std00003|ABCDEFG|Poster|fsdfdsf|dffsdfsdf|C:\Users\Acer\OneDrive\Documents\Y2S1\CCP6224-OOAD\Lab exercise.pdf

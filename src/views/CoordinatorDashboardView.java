@@ -1,24 +1,17 @@
 package views;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.io.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import controllers.SeminarSessionController;
-import controllers.ReportController;
 
-public class CoordinatorDashboardView extends JFrame implements Dashboard {  // Implementing the Dashboard interface
+public class CoordinatorDashboardView extends JFrame implements Dashboard 
+{  // Implementing the Dashboard interface
 
     private String currentCoordinatorID;
-    private Color headerColor = new Color(51, 102, 0);
-    private Color sideBarColor = new Color(229, 255, 204);
-    private Color whiteColor = Color.WHITE;
+    // to call the methods later
+    private ManageSession manageSession;
+    private SchedulePanel seminarSchedule;
+    private ReportPanel report;
+    private NominationPanel nomination;
 
     public CoordinatorDashboardView(String coordinatorID) {
         this.currentCoordinatorID = coordinatorID;
@@ -87,15 +80,10 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         CardLayout cardLayout = new CardLayout();
         content.setLayout(cardLayout);
 
-        // Manage Session
-        JPanel manageSession = new ManageSession();
-        
-        // Seminar
-        JPanel seminarSchedule = new SchedulePanel();
-        
-        JPanel report = new ReportPanel();
-
-        JPanel nomination = new NominationPanel();
+        manageSession = new ManageSession();
+        seminarSchedule = new SchedulePanel();
+        report = new ReportPanel();
+        nomination = new NominationPanel();
 
         content.add(manageSession, "Manage Seminar");
         content.add(seminarSchedule, "Schedule");
@@ -144,282 +132,4 @@ public class CoordinatorDashboardView extends JFrame implements Dashboard {  // 
         System.out.println("Viewing Coordinator Nominations...");
     }
 
-    private class ManageSession extends JPanel
-    {
-        private String[] getEvaluators() 
-        {
-            java.util.ArrayList<String> list = new java.util.ArrayList<>();
-            list.add("-- Select Evaluator --"); // default option
-
-            try {
-                java.util.Scanner sc = new java.util.Scanner(new java.io.File("users.txt"));
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    String[] parts = line.split(",");
-
-                    // parts[2] means the 3rd element in the users.txt, which is the role
-                    if (parts.length >= 3 && parts[2].trim().equalsIgnoreCase("Evaluator")) {
-                        list.add(parts[0].trim()); //extract out the roles
-                    }
-                }
-                sc.close();
-            } catch (Exception e) {
-                // If error, just ignore or print to console
-                System.out.println("File error"); 
-            }
-            // convert into array, to be put into the dropdown list later
-            return list.toArray(new String[0]);
-        }
-
-        private String[] getStudents() 
-        {
-            java.util.ArrayList<String> list = new java.util.ArrayList<>();
-            list.add("-- Select student --"); // default option
-
-            try {
-                java.util.Scanner sc = new java.util.Scanner(new java.io.File("registrations.txt"));
-                
-                while (sc.hasNextLine()) { //keep reading, until the end of the line
-                    String line = sc.nextLine();
-                    String[] parts = line.split("\\|"); //split parts by the "|"
-                    
-                    // parts[0] means the 1st element in the registrations.txt, which is the student id
-                    if (parts.length >= 6) {
-                        list.add(parts[0].trim()); //extract out the roles
-                    }
-                }
-                sc.close();
-            } catch (Exception e) {
-                // If error, just ignore or print to console
-                System.out.println("File error"); 
-            }
-            
-            // convert into array, to be put into the dropdown list later
-            return list.toArray(new String[0]);
-        }
-
-        public ManageSession()
-        {
-            setLayout(new GridBagLayout());
-            setBackground(new Color(255, 255, 255));
-            setOpaque(true);
-        
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(5, 5, 5, 5);
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-
-            //Title
-            JLabel title1 = new JLabel("Manage Sessions");
-            title1.setFont(new Font("SansSerif", Font.BOLD, 30));
-            gbc.gridx = 0; //left column
-            gbc.gridy = 0; //first row
-            gbc.gridwidth = 2; //span two column
-            add(title1, gbc);
-           
-           //Session Type
-            gbc.gridwidth = 1;
-            gbc.gridy++; //go to next row
-            gbc.gridx = 0;
-
-            JLabel sessionTitle = new JLabel("Session Type:");
-            sessionTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
-            add(sessionTitle, gbc);
-            
-            gbc.gridx = 1;
-            String[] sessionType = {"Oral Session", "Poster Session"};
-            JComboBox<String> cb = new JComboBox<>(sessionType);
-            add(cb, gbc);
-
-            // Venue
-            gbc.gridy++; gbc.gridx = 0;
-            JLabel venueTitle = new JLabel("Venue:");
-            venueTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
-            add(venueTitle, gbc);
-
-            gbc.gridx = 1;
-            JTextField venueTextField = new JTextField(40);
-            add(venueTextField, gbc);
-
-            // Date
-            gbc.gridy++; 
-            gbc.gridx = 0;
-            JLabel dateTitle = new JLabel("Date:");
-            dateTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
-            add(dateTitle, gbc);
-
-            gbc.gridx = 1;
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            JFormattedTextField dateField = new JFormattedTextField(dateFormat);
-            dateField.setValue(new Date());
-            dateField.setColumns(10);
-            add(dateField, gbc);
-
-            // Assign Evaluator
-            gbc.gridy++; //go to next row
-            gbc.gridx = 0;
-
-            JLabel assignEvaluator = new JLabel("Evaluator:");
-            assignEvaluator.setFont(new Font("SansSerif", Font.BOLD, 15));
-            add(assignEvaluator, gbc);
-            
-            gbc.gridx = 1;
-            String[] evaluators = getEvaluators(); //get only the role evaluator
-            JComboBox<String> evaluatorBox = new JComboBox<>(evaluators);
-            add(evaluatorBox, gbc);
-
-            // Assign Students
-            gbc.gridy++; //go to next row
-            gbc.gridx = 0;
-            JLabel assignStudent = new JLabel("Student involved:"); 
-            assignStudent.setFont(new Font("SansSerif", Font.BOLD, 15));
-            add(assignStudent, gbc);
-            
-            gbc.gridx = 1;
-            String[] students = getStudents(); //get only the role student
-            JComboBox<String> studentBox = new JComboBox<>(students);
-            add(studentBox, gbc);        
-           
-           // Save button that will fetch all data and then save to text file
-            gbc.gridy++; 
-            gbc.gridx = 1;
-            gbc.anchor = GridBagConstraints.WEST;
-            JButton submit = new JButton("Save");
-            submit.setBackground(new Color(0, 128, 0));
-            submit.setForeground(Color.WHITE);
-            add(submit, gbc);
-
-            submit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String venue = venueTextField.getText();
-                    String date = dateField.getText();
-
-                    if(venue.isEmpty() || date.isEmpty()) {
-                        JOptionPane.showMessageDialog(ManageSession.this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    try {
-                        java.io.FileWriter writer = new java.io.FileWriter("seminars.txt", true);
-                        java.io.BufferedWriter bufferedWriter = new java.io.BufferedWriter(writer);
-
-                        // separate info by ","
-                        bufferedWriter.write((String)cb.getSelectedItem() + "," + venue + "," + date + "," + (String)evaluatorBox.getSelectedItem() + "," + (String)studentBox.getSelectedItem());
-                        bufferedWriter.newLine(); // move to next line
-                        bufferedWriter.close();
-
-                        JOptionPane.showMessageDialog(ManageSession.this, "Session Saved Successfully!");
-
-                        // clear fields after reading
-                        venueTextField.setText("");
-
-                    } catch (java.io.IOException ex) { //display error message
-                        JOptionPane.showMessageDialog(ManageSession.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            });
-            
-            // added so that the form appearing on top left: move to next row, takes up remaining space
-            gbc.gridy++; 
-            gbc.weightx = 1; 
-            gbc.weighty = 1;
-            gbc.fill = GridBagConstraints.BOTH;
-            add(new JLabel(), gbc);
-        }
-    }
-//-------- Seminar Schedule Panel ----------------//
-    private class SchedulePanel extends JPanel {
-        private JTable table;
-        private SeminarSessionController controller = new SeminarSessionController(); // Use Controller
-
-        public SchedulePanel() {
-            setLayout(new BorderLayout());
-            setBackground(whiteColor);
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            JLabel lblTitle = new JLabel("Seminar Schedules");
-            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
-            lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
-            add(lblTitle, BorderLayout.NORTH);
-
-            table = new JTable();
-            styleTable(table); // Your existing style helper
-            add(new JScrollPane(table), BorderLayout.CENTER);
-            
-            loadScheduleData(); // Initial load
-        }
-
-        public void loadScheduleData() {
-            // VIEW ASKS CONTROLLER for the model
-            table.setModel(controller.getScheduleModel());
-            
-            // Re-apply style because setting model can reset column widths
-            styleTable(table); 
-        }
-    }
-
-//-------- Report Panel ----------------//
-    private class ReportPanel extends JPanel {
-        private JTable table;
-        private ReportController controller = new ReportController(); // Use Controller
-
-        public ReportPanel() {
-            setLayout(new BorderLayout());
-            setBackground(whiteColor);
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            JLabel lblTitle = new JLabel("Final Evaluation Reports");
-            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
-            lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
-            add(lblTitle, BorderLayout.NORTH);
-
-            table = new JTable();
-            styleTable(table);
-            add(new JScrollPane(table), BorderLayout.CENTER);
-        }
-
-        public void generateReportData() {
-             // VIEW ASKS CONTROLLER
-            table.setModel(controller.getEvaluationModel());
-            styleTable(table);
-        }
-    }
-
-//-------- Nomination Panel ----------------//
-    private class NominationPanel extends JPanel {
-        private JTextArea resultsArea;
-        private ReportController controller = new ReportController(); // Use Controller
-
-        public NominationPanel() {
-            setLayout(new BorderLayout());
-            setBackground(whiteColor);
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            JLabel lblTitle = new JLabel("Award Nominations Overseer");
-            lblTitle.setFont(new Font("SansSerif", Font.BOLD, 28));
-            add(lblTitle, BorderLayout.NORTH);
-
-            resultsArea = new JTextArea();
-            resultsArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-            resultsArea.setEditable(false);
-            resultsArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            add(new JScrollPane(resultsArea), BorderLayout.CENTER);
-        }
-
-        public void calculateNominations() {
-            // VIEW ASKS CONTROLLER
-            String report = controller.getNominationReport();
-            resultsArea.setText(report);
-        }
-    }
-
-    private void styleTable(JTable table) {
-        table.setRowHeight(30);
-        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        JTableHeader h = table.getTableHeader();
-        h.setOpaque(true); 
-        h.setBackground(headerColor);
-        h.setForeground(Color.WHITE);
-        h.setFont(new Font("SansSerif", Font.BOLD, 15));
-    }
 }
