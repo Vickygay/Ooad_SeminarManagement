@@ -1,1 +1,4 @@
 std00004,E001,Best Oral,Nominated
+std00006,E001,People's Choice,Nominated
+std00002,E002,Best Oral,Nominated
+std00003,E002,People's Choice,Nominated
