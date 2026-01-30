@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class E_FeedbackPanel extends JPanel {
     private JTable table;
@@ -24,7 +26,8 @@ public class E_FeedbackPanel extends JPanel {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(lblTitle, BorderLayout.NORTH);
 
-        String[] columns = {"Date", "Student ID", "Total Score", "Action"};
+        // --- UPDATED COLUMNS: Added Type and Title ---
+        String[] columns = {"Date", "Student ID", "Type", "Presentation Title", "Total Score", "Action"};
         model = new DefaultTableModel(columns, 0) {
             @Override 
             public boolean isCellEditable(int row, int column) {
@@ -36,6 +39,13 @@ public class E_FeedbackPanel extends JPanel {
         table.setRowHeight(35);
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         
+        // Adjust column widths for better view
+        table.getColumnModel().getColumn(0).setPreferredWidth(150); // Date
+        table.getColumnModel().getColumn(1).setPreferredWidth(100); // ID
+        table.getColumnModel().getColumn(2).setPreferredWidth(80);  // Type
+        table.getColumnModel().getColumn(3).setPreferredWidth(300); // Title (Wider)
+        table.getColumnModel().getColumn(4).setPreferredWidth(80);  // Score
+
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(153, 153, 255));
         header.setForeground(Color.WHITE);
@@ -63,9 +73,29 @@ public class E_FeedbackPanel extends JPanel {
         add(hint, BorderLayout.SOUTH);
     }
 
+    // --- Helper: Load Registration Data (Title & Type) into a Map ---
+    private Map<String, String[]> loadStudentRegistry() {
+        Map<String, String[]> registry = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("registrations.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Format: stdID|Title|Type|Supervisor|Abstract|File
+                String[] parts = line.split("\\|");
+                if (parts.length >= 3) {
+                    // Key: StudentID, Value: {Type, Title}
+                    registry.put(parts[0].trim(), new String[]{parts[2].trim(), parts[1].trim()});
+                }
+            }
+        } catch (IOException e) {}
+        return registry;
+    }
+
     public void refreshData() {
         model.setRowCount(0);
         feedbackDetailsList.clear();
+
+        // 1. Load Registry Data first
+        Map<String, String[]> registry = loadStudentRegistry();
 
         try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
             String line;
@@ -94,7 +124,12 @@ public class E_FeedbackPanel extends JPanel {
                     isReadingFeedback = true;
                 } 
                 else if (line.contains("==================") && isReadingFeedback) {
-                    model.addRow(new Object[]{currentDate, currentID, currentScore, "View Details"});
+                    // --- FOUND END OF RECORD, ADD ROW ---
+                    String[] details = registry.getOrDefault(currentID, new String[]{"Unknown", "Unknown"});
+                    String type = details[0];
+                    String title = details[1];
+
+                    model.addRow(new Object[]{currentDate, currentID, type, title, currentScore, "View Details"});
                     feedbackDetailsList.add(currentFeedback.toString());
                     isReadingFeedback = false;
                 }
@@ -104,8 +139,10 @@ public class E_FeedbackPanel extends JPanel {
                     }
                 }
             }
+            // Add the last record if file ends
             if (!currentID.equals("Unknown")) {
-                model.addRow(new Object[]{currentDate, currentID, currentScore, "View Details"});
+                String[] details = registry.getOrDefault(currentID, new String[]{"Unknown", "Unknown"});
+                model.addRow(new Object[]{currentDate, currentID, details[0], details[1], currentScore, "View Details"});
                 feedbackDetailsList.add(currentFeedback.toString());
             }
 

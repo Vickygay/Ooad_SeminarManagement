@@ -3,3 +3,4 @@ std00002|Hello Good Day|Oral|Dr. Lim Niee|Hope that you have the Nice Day|C:\Use
 std00003|Possible|Oral|Dr. Ahmad bin Ismail|The only impossible journey is the one you never begin|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput1.txt
 std00004|Dream|Oral|Dr. Ravi a/l Muthu|A DREAM written down with a date becomes a GOAL. A goal broken down into steps becomes a PLAN. A plan backed by ACTION becomes REALITY|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput2.txt
 std00005|Persistance|Poster|Dr. Kong Han Lin|If you run into a wall, don't turn around and give up. Figure out how to climb it|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileInput3.txt
+std00006|Diamond|Oral|Dr. Rihanna|Find light in the beautiful sea, I choose to be happy You and I, you and I, we're like diamonds in the sky You're a shooting star I see, a vision of ecstasy When you hold me, I'm alive, we're like diamonds in the sky|C:\Users\vicky\OneDrive\Documents\TC7L_G09_A2\fileOutput1.txt

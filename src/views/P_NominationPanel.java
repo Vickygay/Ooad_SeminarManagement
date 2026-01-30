@@ -35,7 +35,7 @@ public class P_NominationPanel extends JPanel {
         
         // Header Style
         JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(102, 102, 255)); // Blueish for view
+        header.setBackground(new Color(0, 102, 204)); 
         header.setForeground(Color.WHITE);
         header.setFont(new Font("SansSerif", Font.BOLD, 15));
 

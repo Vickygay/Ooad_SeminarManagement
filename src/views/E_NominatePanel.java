@@ -7,6 +7,8 @@ import java.awt.*;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 public class E_NominatePanel extends JPanel {
     private JTable table;
@@ -26,8 +28,8 @@ public class E_NominatePanel extends JPanel {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Table Setup
-        String[] columns = {"Student ID", "Evaluation Status", "Total Score", "Action"};
+        // --- UPDATED COLUMNS: Added "Type" ---
+        String[] columns = {"Student ID", "Type", "Total Score", "Evaluation Status", "Action"};
         model = new DefaultTableModel(columns, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
@@ -37,7 +39,7 @@ public class E_NominatePanel extends JPanel {
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         
         JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(0, 102, 204));
+        header.setBackground(new Color(153, 153, 255));
         header.setForeground(Color.WHITE);
         header.setFont(new Font("SansSerif", Font.BOLD, 15));
 
@@ -68,7 +70,7 @@ public class E_NominatePanel extends JPanel {
 
     public void refreshData() {
         model.setRowCount(0);
-        java.util.Map<String, Double> eligibleScores = getHighScoringStudents();
+        Map<String, Double> eligibleScores = getHighScoringStudents();
         
         // 1. Get list of students I ALREADY nominated
         Set<String> alreadyNominatedByMe = getMyNominatedStudents();
@@ -78,6 +80,7 @@ public class E_NominatePanel extends JPanel {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length >= 5) {
+                    String fType = parts[0].trim(); // Get the Type (Oral/Poster)
                     String fEvaluator = parts[3].trim();
                     String fStudent = parts[4].trim();
 
@@ -87,7 +90,8 @@ public class E_NominatePanel extends JPanel {
                         // 2. Filter: Only add if NOT already nominated
                         if (!alreadyNominatedByMe.contains(fStudent)) {
                             double score = eligibleScores.get(fStudent);
-                            model.addRow(new Object[]{fStudent, "Eligible for Nomination", score, "Select to Nominate"});
+                            // --- UPDATED ROW ADDITION ---
+                            model.addRow(new Object[]{fStudent, fType, score, "Eligible", "Select to Nominate"});
                         }
                     }
                 }
@@ -95,8 +99,8 @@ public class E_NominatePanel extends JPanel {
         } catch (IOException e) { }
     }
 
-    private java.util.Map<String, Double> getHighScoringStudents() {
-        java.util.Map<String, Double> highScorers = new java.util.HashMap<>();
+    private Map<String, Double> getHighScoringStudents() {
+        Map<String, Double> highScorers = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("evaluations.txt"))) {
             String line;
             String currentID = null;
@@ -118,13 +122,11 @@ public class E_NominatePanel extends JPanel {
         return highScorers;
     }
 
-    // New Helper: Check nominations.txt for previous actions
     private Set<String> getMyNominatedStudents() {
         Set<String> nominated = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader("nominations.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
-                // Format: StudentID, EvaluatorID, AwardType, Status
                 String[] parts = line.split(",");
                 if (parts.length >= 2) {
                     if (parts[1].trim().equalsIgnoreCase(myEvaluatorID)) {
