@@ -46,7 +46,8 @@ public class StudentDashboardView extends JFrame {
 
         // Create Buttons
         JButton btnReg = createSidebarButton("Registration Form");
-        JButton btnViewReg = createSidebarButton("My Registration"); // NEW BUTTON
+        JButton btnViewReg = createSidebarButton("My Registration");
+        JButton btnSession = createSidebarButton("My Seminar Session"); // ADDED GETSESSION BUTTON
         JButton btnNominee = createSidebarButton("View Nominee"); 
         JButton btnAwardee = createSidebarButton("View Awardee"); 
         JButton btnProfile = createSidebarButton("Update Profile"); 
@@ -59,7 +60,8 @@ public class StudentDashboardView extends JFrame {
         btnLogout.setFocusPainted(false);
         
         sidebar.add(btnReg);
-        sidebar.add(btnViewReg); // Add New Button
+        sidebar.add(btnViewReg);
+        sidebar.add(btnSession); // ADDED TO SIDEBAR
         sidebar.add(btnNominee);
         sidebar.add(btnAwardee);
         sidebar.add(btnProfile);
@@ -70,7 +72,6 @@ public class StudentDashboardView extends JFrame {
         sidebar.add(new JLabel(""));
         sidebar.add(new JLabel(""));
         sidebar.add(new JLabel(""));
-        sidebar.add(new JLabel("")); // 6th spacer
 
         sidebar.add(btnLogout); 
 
@@ -86,14 +87,15 @@ public class StudentDashboardView extends JFrame {
 
         // --- Panels ---
         S_RegistrationPanel regPanel = new S_RegistrationPanel(currentStudentID);
-        // We initialize this, but we will "refresh" it when the button is clicked to get latest data
         S_ViewRegistrationPanel viewRegPanel = new S_ViewRegistrationPanel(currentStudentID); 
+        S_GetSessionPanel sessionPanel = new S_GetSessionPanel(currentStudentID); // INITIALIZED
         P_NominationPanel nomineePanel = new P_NominationPanel();
         P_AwardeePanel awardeePanel = new P_AwardeePanel();
 
         // Add to CardLayout
         content.add(regPanel, "Registration");
-        content.add(viewRegPanel, "ViewRegistration"); // Add to cards
+        content.add(viewRegPanel, "ViewRegistration");
+        content.add(sessionPanel, "ViewSession"); // ADDED TO CARDS
         content.add(nomineePanel, "Nominee");
         content.add(awardeePanel, "Awardee");
 
@@ -104,13 +106,17 @@ public class StudentDashboardView extends JFrame {
         // =========================================================
         btnReg.addActionListener(e -> cardLayout.show(content, "Registration"));
         
-        // NEW: Logic for View Registration Button
         btnViewReg.addActionListener(e -> {
-            // Re-create the panel to ensure it fetches the latest data from the file
-            // Otherwise, if they just registered, the old panel won't show the new data.
             S_ViewRegistrationPanel newPanel = new S_ViewRegistrationPanel(currentStudentID);
             content.add(newPanel, "ViewRegistration"); 
             cardLayout.show(content, "ViewRegistration");
+        });
+
+        // ADDED LOGIC FOR SESSION BUTTON
+        btnSession.addActionListener(e -> {
+            S_GetSessionPanel newSessionPanel = new S_GetSessionPanel(currentStudentID);
+            content.add(newSessionPanel, "ViewSession"); 
+            cardLayout.show(content, "ViewSession");
         });
 
         btnNominee.addActionListener(e -> {
@@ -119,7 +125,7 @@ public class StudentDashboardView extends JFrame {
         });
 
         btnAwardee.addActionListener(e -> {
-            awardeePanel.calculateWinners(); // Calculate fresh results
+            awardeePanel.calculateWinners(); 
             cardLayout.show(content, "Awardee");
         });
 
@@ -151,5 +157,4 @@ public class StudentDashboardView extends JFrame {
         btn.setBorder(BorderFactory.createLineBorder(new Color(180, 180, 200), 1)); 
         return btn;
     }
-
 }
