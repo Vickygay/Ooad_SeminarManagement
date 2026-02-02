@@ -8,7 +8,12 @@ std00002,s2,Student,Chan Wai Ming,waiming@student.com
 std00003,s3,Student,Justin Wong,justin@student.com
 std00004,s4,student,Ali Osman,ali@student.com
 std00005,s5,student,Khairil, khairil@student.com
-std00006,s6,student,Loo Shi Yun, shiyun@student.com
+std00006,s6,student,Loo Shi Yun,shiyun@student.com
+std00007,s7,student,Mow Zi Yi,mowziyi@student.com
+std00008,s8,student,Vincent Cheah,vincentcheah@student.com
+std00009,s9,student,Abu,abu@student.com
+std00010,s10,student,Ahmad,ahmad@student.com
+std00011,s11,student,Siti,siti@student.com
 
 Evaluator 
 E001,e1,Evaluator,Vicky Pong,vicky@evaluator.com
