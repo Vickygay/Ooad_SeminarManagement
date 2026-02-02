@@ -3,6 +3,9 @@ package views;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import models.Presentation;
 import controllers.EvaluationController;
 
@@ -14,94 +17,104 @@ public class EvaluationView extends JFrame {
     private Presentation presentation;
 
     // --- COLORS ---
-    // 2. Grid Headers (Criteria, Scoring, Feedback)
-    private Color lightPurple = new Color(153, 153, 255); 
-    
-    // 3. Row Labels (Problem Clarity, etc.) & Button
     private Color lightPurple2 = new Color(204, 204, 255); 
-    
     private Color whiteColor = Color.WHITE;
     private Color inputBackgroundColor = new Color(245, 245, 255);
-    // Font
     private Font inputFont = new Font("Arial", Font.PLAIN, 16);
 
     public EvaluationView(Presentation presentation) {
         this.presentation = presentation;
 
-        setTitle("Evaluate Presentation");
-        setSize(1100, 750);
+        setTitle("Evaluate Presentation - " + presentation.getStudentID());
+        setSize(1100, 800);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main Container
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(whiteColor);
 
         // =========================================================================
-        // 1. HEADER PANEL (Solid Colored Strip)
+        // 1. INFO PANEL (Student Details)
         // =========================================================================
-        JPanel headerPanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        headerPanel.setBackground(lightPurple); 
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0)); 
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBackground(new Color(240, 240, 255));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        // --- LOAD DATA ---
+        String[] details = getStudentDetails(presentation.getStudentID());
+        String title = details[0];
+        String type = details[1];
+        String abstractText = details[2];
 
-        JLabel titleLabel = new JLabel("Evaluation Rubrics", JLabel.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE); 
+        // Line 1: ID & Type
+        gbc.gridx = 0; gbc.gridy = 0;
+        JLabel idLabel = new JLabel("Student ID: " + presentation.getStudentID());
+        idLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        infoPanel.add(idLabel, gbc);
+        
+        gbc.gridx = 1;
+        JLabel typeLabel = new JLabel("Presentation Type: " + type);
+        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        typeLabel.setForeground(new Color(0, 102, 204));
+        infoPanel.add(typeLabel, gbc);
 
-        String studentID = presentation.getStudentID();
-        JLabel studentLabel = new JLabel("Evaluating Student ID: " + (studentID != null ? studentID : "Unknown"), JLabel.CENTER);
-        studentLabel.setFont(new Font("SansSerif", Font.ITALIC, 18));
-        studentLabel.setForeground(Color.WHITE);
+        // Line 2: Title
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2;
+        JLabel titleLbl = new JLabel("Title: " + title);
+        titleLbl.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        infoPanel.add(titleLbl, gbc);
 
-        headerPanel.add(titleLabel);
-        headerPanel.add(studentLabel);
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        // Line 3: Abstract
+        gbc.gridy = 2;
+        JTextArea abstractDisplay = new JTextArea(abstractText);
+        abstractDisplay.setFont(new Font("SansSerif", Font.ITALIC, 14));
+        abstractDisplay.setLineWrap(true);
+        abstractDisplay.setWrapStyleWord(true);
+        abstractDisplay.setEditable(false);
+        abstractDisplay.setBackground(new Color(240, 240, 255));
+        abstractDisplay.setBorder(BorderFactory.createTitledBorder("Abstract"));
+        infoPanel.add(new JScrollPane(abstractDisplay) {{ setPreferredSize(new Dimension(800, 100)); }}, gbc);
+
+        mainPanel.add(infoPanel, BorderLayout.NORTH);
 
         // =========================================================================
-        // 2. RUBRICS PANEL (The Grid)
+        // 2. RUBRICS PANEL
         // =========================================================================
         JPanel rubricsPanel = new JPanel();
         rubricsPanel.setLayout(new GridLayout(5, 3, 20, 20)); 
         rubricsPanel.setBackground(whiteColor);
         rubricsPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40)); 
 
-        // --- Row 1: Headers (Use lightPurple - 153) ---
         rubricsPanel.add(createMiniBoxLabel("Criteria", lightPurple2, Color.BLACK));
         rubricsPanel.add(createMiniBoxLabel("Scoring (0-5)", lightPurple2,Color.BLACK));
         rubricsPanel.add(createMiniBoxLabel("Feedback", lightPurple2, Color.BLACK));
 
-        // --- Row 2: Problem Clarity (Use lightPurple2 - 204) ---
+        // Rows
         rubricsPanel.add(createMiniBoxLabel("Problem Clarity", whiteColor, Color.BLACK));
-        scoreField1 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(scoreField1)); 
-        feedbackField1 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(feedbackField1));
+        scoreField1 = createSmallTextField(); rubricsPanel.add(wrapInPanel(scoreField1)); 
+        feedbackField1 = createSmallTextField(); rubricsPanel.add(wrapInPanel(feedbackField1));
 
-        // --- Row 3: Methodology (Use lightPurple2 - 204) ---
         rubricsPanel.add(createMiniBoxLabel("Methodology", whiteColor, Color.BLACK));
-        scoreField2 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(scoreField2));
-        feedbackField2 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(feedbackField2));
+        scoreField2 = createSmallTextField(); rubricsPanel.add(wrapInPanel(scoreField2));
+        feedbackField2 = createSmallTextField(); rubricsPanel.add(wrapInPanel(feedbackField2));
 
-        // --- Row 4: Results (Use lightPurple2 - 204) ---
         rubricsPanel.add(createMiniBoxLabel("Results", whiteColor, Color.BLACK));
-        scoreField3 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(scoreField3));
-        feedbackField3 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(feedbackField3));
+        scoreField3 = createSmallTextField(); rubricsPanel.add(wrapInPanel(scoreField3));
+        feedbackField3 = createSmallTextField(); rubricsPanel.add(wrapInPanel(feedbackField3));
 
-        // --- Row 5: Presentation (Use lightPurple2 - 204) ---
         rubricsPanel.add(createMiniBoxLabel("Presentation", whiteColor, Color.BLACK));
-        scoreField4 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(scoreField4));
-        feedbackField4 = createSmallTextField();
-        rubricsPanel.add(wrapInPanel(feedbackField4));
+        scoreField4 = createSmallTextField(); rubricsPanel.add(wrapInPanel(scoreField4));
+        feedbackField4 = createSmallTextField(); rubricsPanel.add(wrapInPanel(feedbackField4));
 
         mainPanel.add(rubricsPanel, BorderLayout.CENTER);
 
         // =========================================================================
-        // 3. BOTTOM PANEL (Submit Button)
+        // 3. BOTTOM PANEL
         // =========================================================================
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBackground(whiteColor);
@@ -110,8 +123,6 @@ public class EvaluationView extends JFrame {
         submitButton = new JButton("Submit Evaluation");
         submitButton.setFont(new Font("SansSerif", Font.BOLD, 18));
         submitButton.setPreferredSize(new Dimension(250, 50));
-        
-        // Button uses the lighter purple (204)
         submitButton.setBackground(lightPurple2); 
         submitButton.setForeground(Color.BLACK);
         submitButton.setFocusPainted(false);
@@ -122,20 +133,44 @@ public class EvaluationView extends JFrame {
 
         add(mainPanel);
 
-        // Button Logic
         submitButton.addActionListener(e -> handleSubmit());
     }
 
-    // --- HELPER: Create "Mini Box" Labels with Custom Color ---
+    // --- UPDATED HELPER: Read Registration Data Robustly ---
+    private String[] getStudentDetails(String id) {
+        String[] data = {"(Title Not Found)", "(Type Not Found)", "(Abstract Not Found)"};
+        
+        if (id == null || id.trim().isEmpty()) return data;
+
+        try (BufferedReader br = new BufferedReader(new FileReader("registrations.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // File Format: stdID|Title|Type|Supervisor|Abstract|File
+                // We use split("\\|") because | is a special regex character
+                String[] parts = line.split("\\|");
+                
+                if (parts.length >= 5) { // Ensure enough columns exist
+                    String fileID = parts[0].trim();
+                    if (fileID.equalsIgnoreCase(id.trim())) {
+                        data[0] = parts[1]; // Title
+                        data[1] = parts[2]; // Type
+                        data[2] = parts[4]; // Abstract
+                        break; 
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading registrations.txt: " + e.getMessage());
+        }
+        return data;
+    }
+
     private JLabel createMiniBoxLabel(String text, Color bgColor, Color textColor) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setOpaque(true); 
-        
-        label.setBackground(bgColor); // Set Background
-        label.setForeground(textColor); // Set Text Color (White or Black)
-        
+        label.setBackground(bgColor); 
+        label.setForeground(textColor); 
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
-        
         label.setBorder(new CompoundBorder(
             BorderFactory.createLineBorder(new Color(100, 100, 180), 1),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
@@ -143,25 +178,18 @@ public class EvaluationView extends JFrame {
         return label;
     }
 
-    // --- HELPER: Create Smaller Input Fields ---
     private JTextField createSmallTextField() {
         JTextField tf = new JTextField(15); 
         tf.setFont(inputFont);
         tf.setPreferredSize(new Dimension(200, 35)); 
-        
-        // --- THIS PART ADDS THE COLOR & BORDER ---
-        tf.setBackground(inputBackgroundColor); // Light Lavender Background
-        
-        // Add a thin border so it looks like a box
+        tf.setBackground(inputBackgroundColor); 
         tf.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(150, 150, 220), 1), // Blue-ish border
-            BorderFactory.createEmptyBorder(2, 5, 2, 5) // Padding inside text field
+            BorderFactory.createLineBorder(new Color(150, 150, 220), 1), 
+            BorderFactory.createEmptyBorder(2, 5, 2, 5) 
         ));
-        
         return tf;
     }
 
-    // --- HELPER: Wrap TextField in a Panel ---
     private JPanel wrapInPanel(JComponent component) {
         JPanel p = new JPanel(new GridBagLayout()); 
         p.setBackground(Color.WHITE);
